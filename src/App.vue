@@ -1,23 +1,37 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view></router-view>
+    <Headerbar/>
+    <Menubar/>
+    <div class="content">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app',
-};
+  import Headerbar from './components/Headerbar';
+  import Menubar from './components/Menubar';
+
+  export default {
+    name: 'app',
+    components: {
+      Headerbar,
+      Menubar,
+    },
+  };
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style rel="stylesheet/sass" lang="sass">
+  #app
+    font-family: 'Avenir', Helvetica, Arial, sans-serif
+    -webkit-font-smoothing: antialiased
+    -moz-osx-font-smoothing: grayscale
+    /*margin-top: 64px*/
+    background: #e5e6e6
+    background-size: 100% 100%
+    color: #313534
+    .content
+      position: relative
+      padding-left: 64px
+      padding-top: 64px
 </style>
