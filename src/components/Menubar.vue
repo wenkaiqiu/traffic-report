@@ -1,6 +1,7 @@
 <template>
   <div id="menubar">
-    <ul>
+
+    <ul id="main-menu" class="gui-controls">
       <router-link tag="li" to="/flow-trend">
         <a>FlowTrend</a>
       </router-link>
@@ -39,4 +40,14 @@
     width: 64px
     color: rgba(255, 255, 255, 0.55)
     background: #2b323a
+
+  #main-menu
+    overflow-x: hidden
+  .gui-controls
+    padding: 0
+    & > li
+      position: relative
+      margin-bottom: 12px
+    li
+      list-style: none
 </style>
