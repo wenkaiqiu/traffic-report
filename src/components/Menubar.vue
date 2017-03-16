@@ -2,11 +2,11 @@
   <div id="menubar">
 
     <ul id="main-menu" class="gui-controls">
-      <router-link tag="li" to="/flow-trend">
-        <a>FlowTrend</a>
-      </router-link>
       <router-link tag="li" to="/real-time">
         <a>RealTime</a>
+      </router-link>
+      <router-link tag="li" to="/flow-trend">
+        <a>FlowTrend</a>
       </router-link>
       <router-link tag="li" to="/basic-management">
         <a>BasicManagement</a>

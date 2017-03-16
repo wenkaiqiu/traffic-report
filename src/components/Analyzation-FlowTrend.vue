@@ -1,16 +1,16 @@
 <template>
-  <div id="flow-trend">
-    <h1>Flow Trend Analyzation</h1>
+  <div id="real-time">
+    <h1>Real Time Analyzation</h1>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'flow-trend',
+    name: 'real-time',
   };
 </script>
 
 <style rel="stylesheet/sass" lang="sass">
-  #flow-trend
+  #real-time
 
 </style>
