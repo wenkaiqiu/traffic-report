@@ -82,6 +82,62 @@
           </div><!--end .card -->
         </div><!--end .col -->
         <!-- END 应用流量排名 -->
+
+        <!-- BEGIN TCP流量排名 -->
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-head">
+              <header>TCP流量排名</header>
+            </div><!--end .card-head -->
+            <div class="nano has-scollbar" style="height: 300px">
+              <div class="nano-content" style="right: -15px">
+                <div class="card-body no-padding scroll">
+                  <ul class="list divider-full-bleed">
+                    <li class="tile">
+                      <div class="tile-content">
+                        <div class="tile-text">Ann Laurens</div>
+                      </div>
+                    </li>
+                    <li class="tile">
+                      <div class="tile-content">
+                        <div class="tile-text">Ann Laurens</div>
+                      </div>
+                    </li>
+                  </ul>
+                </div><!--end .card-body -->
+              </div>
+            </div>
+          </div><!--end .card -->
+        </div><!--end .col -->
+        <!-- END TCP流量排名 -->
+
+        <!-- BEGIN UDP流量排名 -->
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-head">
+              <header>UDP流量排名</header>
+            </div><!--end .card-head -->
+            <div class="nano has-scollbar" style="height: 300px">
+              <div class="nano-content" style="right: -15px">
+                <div class="card-body no-padding scroll">
+                  <ul class="list divider-full-bleed">
+                    <li class="tile">
+                      <div class="tile-content">
+                        <div class="tile-text">Ann Laurens</div>
+                      </div>
+                    </li>
+                    <li class="tile">
+                      <div class="tile-content">
+                        <div class="tile-text">Ann Laurens</div>
+                      </div>
+                    </li>
+                  </ul>
+                </div><!--end .card-body -->
+              </div>
+            </div>
+          </div><!--end .card -->
+        </div><!--end .col -->
+        <!-- END UDP流量排名 -->
       </div>
     </div>
 
