@@ -1,10 +1,21 @@
 <template>
   <div id="real-time">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div id="container" style="min-width:400px;height:400px"></div>
+    <div class="card d-flex flex-column">
+      <div class="d-flex flex-row">
+        <div class="mb-2 btn-group card-body" data-toggle="buttons">
+          <label role='button' class="btn btn-secondary active" @click="predictDay">
+            <input type="radio" name="options" id="option1" checked> 1 Day
+          </label>
+          <label role='button' class="btn btn-secondary" @click="predictWeek">
+            <input type="radio" name="options" id="option2"> 1 Week
+          </label>
+          <label role='button' class="btn btn-secondary" @click="predictMon">
+            <input type="radio" name="options" id="option3"> 1 Month
+          </label>
         </div>
+      </div>
+      <div class="d-flex flex-row">
+        <div id="container" style="min-width:400px;height:400px"></div>
       </div>
     </div>
   </div>
@@ -13,7 +24,7 @@
 <script>
   import Highcharts from 'highcharts';
   require('highcharts/highcharts-more')(Highcharts);
-  import { ranges, averages } from '../../static/data';
+  import { ranges, averages,averages_week, ranges_week} from '../../static/data';
 
   export default {
     name: 'real-time',
@@ -21,18 +32,37 @@
       return {
         range_data: ranges,
         average_data: averages,
+        chart: null,
       };
+    },
+    methods: {
+      predictDay: function () {
+        console.log("1111111");
+      },
+      predictWeek: function () {
+        console.log("2222222");
+        this.chart.series[0].setData(averages_week);
+        this.chart.series[1].setData(ranges_week);
+        this.chart.xAxis[0].update({
+          tickInterval: 24 * 60 * 60 * 1000,
+          dateTimeLabelFormats: {
+            day: '%Y-%m-%d'
+          }
+        });
+      },
+      predictMon: function () {
+        console.log("333333");
+      }
     },
     mounted: function () {
       const self = this;
-
-      let chart = new Highcharts.chart('container', {
+      self.chart = new Highcharts.chart('container', {
         title: {
-          text: '某地7月份气温范围及平均值'
+          text: '流速趋势图'
         },
         xAxis: {
           type: 'datetime',
-          //tickInterval: 7 * 24 * 60 * 60 * 1000,
+          tickInterval: 7 * 24 * 60 * 60 * 1000,
           dateTimeLabelFormats: {
             week: '%Y-%m-%d'
           }
@@ -45,14 +75,14 @@
         tooltip: {
           crosshairs: true,
           shared: true,
-          valueSuffix: '°C',
+          valueSuffix: ' Mbps',
           dateTimeLabelFormats: {
             day: '%Y-%m-%d'
           }
         },
         legend: {},
         series: [{
-          name: '气温',
+          name: '流速',
 //          data: self.average_data,
           data: averages,
           zIndex: 1,
@@ -79,6 +109,8 @@
 
 <style rel="stylesheet/sass" lang="sass" scoped>
   #real-time
+    position: relative
+    padding: 24px
     .card
       position: relative
       margin-bottom: 24px
@@ -107,7 +139,10 @@
         position: relative
         &:last-child
           border-radius: 0 0 2px 2px
-
+      .my-options
+        border-radius: 0 0 2px 2px
     #container
+      flex: 1
       position: relative
+      width: 100%
 </style>
