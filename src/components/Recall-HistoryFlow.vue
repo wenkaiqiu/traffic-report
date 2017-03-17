@@ -4,57 +4,132 @@
       <div class="col-md-12">
         <div class="card">
           <div id="master-container" style="height:400px">
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-head">
-          <!-- Nav tabs -->
-          <ul class="nav nav-tabs nav-fill" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link active" data-toggle="tab" href="#segment" role="tab">网段</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#application" role="tab">应用系统</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#ip" role="tab">IP会话</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#tcp" role="tab">TCP会话</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#udp" role="tab">UDP会话</a>
-            </li>
-          </ul>
-        </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-head">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs nav-fill" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#segment" role="tab" @click="changeData('segment')">网段</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#application" role="tab" @click="changeData('application')">应用系统</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#ip" role="tab" @click="changeData('ip')">IP会话</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tcp" role="tab" @click="changeData('tcp')">TCP会话</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#udp" role="tab" @click="changeData('udp')">UDP会话</a>
+              </li>
+            </ul>
+          </div>
 
-        <!-- Tab panes -->
-        <div class="card-body tab-content">
-          <div class="tab-pane active" id="segment" role="tabpanel">...</div>
-          <div class="tab-pane" id="application" role="tabpanel">...</div>
-          <div class="tab-pane" id="ip" role="tabpanel">...</div>
-          <div class="tab-pane" id="tcp" role="tabpanel">...</div>
-          <div class="tab-pane" id="ucp" role="tabpanel">...</div>
+          <!-- Tab panes -->
+          <div class="card-body tab-content">
+            <div class="tab-pane active" id="segment" role="tabpanel">
+              <table class="table table-hover">
+                <thead class="thead-default">
+                <tr>
+                  <th>#</th>
+                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(item, index) in current_data">
+                  <th scope="row">{{index}}</th>
+                  <td v-for="value of item">{{value}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pane" id="application" role="tabpanel">
+              <table class="table table-hover">
+                <thead class="thead-default">
+                <tr>
+                  <th>#</th>
+                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(item, index) in current_data">
+                  <th scope="row">{{index}}</th>
+                  <td v-for="value of item">{{value}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pane" id="ip" role="tabpanel">
+              <table class="table table-hover">
+                <thead class="thead-default">
+                <tr>
+                  <th>#</th>
+                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(item, index) in current_data">
+                  <th scope="row">{{index}}</th>
+                  <td v-for="value of item">{{value}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pane" id="tcp" role="tabpanel">
+              <table class="table table-hover">
+                <thead class="thead-default">
+                <tr>
+                  <th>#</th>
+                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(item, index) in current_data">
+                  <th scope="row">{{index}}</th>
+                  <td v-for="value of item">{{value}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pane" id="ucp" role="tabpanel">
+              <table class="table table-hover">
+                <thead class="thead-default">
+                <tr>
+                  <th>#</th>
+                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(item, index) in current_data">
+                  <th scope="row">{{index}}</th>
+                  <td v-for="value of item">{{value}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div id="pie-container"></div>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div id="pie-container"></div>
-      </div>
-    </div>
-  </div>
   </div>
 </template>
 
 <script>
   import $ from 'jquery';
   import Highcharts from 'highcharts';
-  import { history_data } from '../../static/data';
+  import { history_data, data_application, data_udp, data_tcp, data_ip, data_segments } from '../../static/data';
 
   export default {
     name: 'history-flow',
@@ -63,14 +138,41 @@
       let date = new Date();
       return {
         history: history_data,
+        chart: null,
         detailStart: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getDate()),
         detailEnd: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getDate() - 1),
+        current_data: data_segments,
       };
     },
     methods: {
+      changeData: function (item) {
+        const self = this;
+        switch (item) {
+          case 'segment':
+//            self.chart.series[0].setData(data_segments);
+            self.current_data = data_segments;
+            break;
+          case 'application':
+//            self.chart.series[0].setData(data_application);
+            self.current_data = data_application;
+            break;
+          case 'ip':
+//            self.chart.series[0].setData(data_ip);
+            self.current_data = data_ip;
+            break;
+          case 'udp':
+//            self.chart.series[0].setData(data_udp);
+            self.current_data = data_udp;
+            break;
+          case 'tcp':
+//            self.chart.series[0].setData(data_tcp);
+            self.current_data = data_tcp;
+            break;
+        }
+      },
       createMaster: function () {
         const self = this;
-        let masterChart = new Highcharts.chart('master-container', {
+        self.chart = new Highcharts.chart('master-container', {
           chart: {
             reflow: false, //浏览器大小变动时不刷新
             borderWidth: 0,
@@ -197,7 +299,7 @@
             plotShadow: false
           },
           title: {
-            text: '2014 某网站上各个浏览器的访问量占比'
+            text: '各网段流量比'
           },
           tooltip: {
             headerFormat: '{series.name}<br>',
@@ -205,6 +307,8 @@
           },
           plotOptions: {
             pie: {
+              center: [150, 150],
+              size: 300,
               allowPointSelect: true,
               cursor: 'pointer',
               dataLabels: {
@@ -213,9 +317,16 @@
               showInLegend: true
             }
           },
+          legend: {
+            align: 'right',
+            verticalAlign: 'top',
+            x: 0,
+            y: 20,
+            layout: 'vertical'
+          },
           series: [{
             type: 'pie',
-            name: '浏览器访问量占比',
+            name: '各网段流量比',
             data: [
               ['Firefox', 45.0],
               ['IE', 26.8],
