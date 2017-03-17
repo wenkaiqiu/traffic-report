@@ -3,14 +3,19 @@
 import Vue from 'vue';
 import App from './App';
 import router from './router';
+import store from './stores';
 import '../node_modules/bootstrap/dist/css/bootstrap.css';
 import '../node_modules/bootstrap/dist/js/bootstrap';
+import '../static/css/material-design-iconic-font.min.css';
+import '../static/css/font-awesome.min.css';
+import '../static/css/global.sass';
 
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  store,
   router,
   template: '<App/>',
   components: { App },

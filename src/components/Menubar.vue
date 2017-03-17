@@ -1,23 +1,24 @@
 <template>
-  <div id="menubar">
-    <ul>
-      <router-link tag="li" to="/flow-trend">
-        <a>FlowTrend</a>
-      </router-link>
+  <div id="menubar" class="menubar-inverse animate">
+
+    <ul id="main-menu" class="gui-controls">
       <router-link tag="li" to="/real-time">
-        <a>RealTime</a>
+        <a><div class="gui-icon"><i class="md md-home"></i></div></a>
       </router-link>
-      <router-link tag="li" to="/basic-management">
-        <a>BasicManagement</a>
-      </router-link>
-      <router-link tag="li" to="/configuration-management">
-        <a>ConfigurationManagement</a>
-      </router-link>
-      <router-link tag="li" to="/data-package">
-        <a>DataPackage</a>
+      <router-link tag="li" to="/flow-trend">
+        <a><div class="gui-icon"><i class="md md-trending-up"></i></div></a>
       </router-link>
       <router-link tag="li" to="/history-flow">
-        <a>HistoryFlow</a>
+        <a><div class="gui-icon"><i class="md md-poll"></i></div></a>
+      </router-link>
+      <router-link tag="li" to="/data-package">
+        <a><div class="gui-icon"><i class="md md-laptop-windows"></i></div></a>
+      </router-link>
+      <router-link tag="li" to="/basic-management">
+        <a><div class="gui-icon"><i class="md md-settings"></i></div></a>
+      </router-link>
+      <router-link tag="li" to="/configuration-management">
+        <a><div class="gui-icon"><i class="md md-settings-applications"></i></div></a>
       </router-link>
     </ul>
   </div>
@@ -39,4 +40,48 @@
     width: 64px
     color: rgba(255, 255, 255, 0.55)
     background: #2b323a
+    #main-menu
+      overflow-x: hidden
+  .gui-controls
+    padding: 0
+    & > li
+      position: relative
+      margin-bottom: 12px
+      list-style: none
+      > a
+        position: relative
+        display: block
+        text-decoration: none
+        padding: 12px 0
+        font-size: 12px
+        line-height: normal
+        border-radius: 0
+        min-height: 40px
+        max-height: 64px
+        z-index: 1
+    .gui-icon
+      position: absolute
+      left: 12px
+      top: 0
+      width: 40px
+      height: 40px
+      color: #535858
+      font-size: 18px
+      overflow: hidden
+      border-radius: 999px
+      -webkit-transition: all 0.15s linear
+      -o-transition: all 0.15s linear
+      transition: all 0.15s linear
+      .md:first-child
+        position: absolute
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
+        margin: auto
+        line-height: 40px
+        width: 1em
+  .menubar-inverse .gui-icon
+    color: rgba(255, 255, 255, 0.65)
+
 </style>
