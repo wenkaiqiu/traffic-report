@@ -9,7 +9,7 @@
             <div class="card-body no-padding">
               <div class="alert alert-callout alert-info no-margin">
                 <strong class="pull-right my-text-success my-text-lg">0,38% <i class="md md-trending-up"></i></strong>
-                <strong class="my-text-xl">32,829 Mbps</strong><br/>
+                <strong class="my-text-xl">{{flow_all}} Mbps</strong><br/>
                 <span class="opacity-50">实时流速</span>
               </div>
             </div><!--end .card-body -->
@@ -23,7 +23,7 @@
             <div class="card-body no-padding">
               <div class="alert alert-callout alert-danger no-margin">
                 <strong class="pull-right text-danger my-text-lg">0,18% <i class="md md-trending-down"></i></strong>
-                <strong class="my-text-xl">42.90 Mbps</strong><br/>
+                <strong class="my-text-xl">{{flow_tcp}} Mbps</strong><br/>
                 <span class="opacity-50">TCP实时流速</span>
               </div>
             </div><!--end .card-body -->
@@ -37,7 +37,7 @@
             <div class="card-body no-padding">
               <div class="alert alert-callout alert-success no-margin">
                 <strong class="pull-right text-danger my-text-lg">0,18% <i class="md md-trending-down"></i></strong>
-                <strong class="my-text-xl">54 Mbps</strong><br/>
+                <strong class="my-text-xl">{{flow_udp}} Mbps</strong><br/>
                 <span class="opacity-50">UDP实时流速</span>
               </div>
             </div><!--end .card-body -->
@@ -149,8 +149,60 @@
 
   export default {
     name: 'flow-trend',
-
-    mounted: () => {
+    data: function () {
+      return {
+        series1: [
+          (function () {
+            // generate an array of random data
+            var data = [],
+              time = (new Date()).getTime(),
+              i;
+            for (i = -19; i <= 0; i += 1) {
+              data.push({
+                x: time + i * 1000,
+                y: Math.random(),
+              });
+            }
+            return data;
+          }()),
+        ],
+        series2: [
+          (function () {
+            // generate an array of random data
+            var data = [],
+              time = (new Date()).getTime(),
+              i;
+            for (i = -19; i <= 0; i += 1) {
+              data.push({
+                x: time + i * 1000,
+                y: Math.random(),
+              });
+            }
+            return data;
+          }()),
+        ],
+        series3: [
+          (function () {
+            // generate an array of random data
+            var data = [],
+              time = (new Date()).getTime(),
+              i;
+            for (i = -19; i <= 0; i += 1) {
+              data.push({
+                x: time + i * 1000,
+                y: Math.random(),
+              });
+            }
+            return data;
+          }()),
+        ],
+        flow_all: 0,
+        flow_udp: 0,
+        flow_tcp: 0,
+      };
+    },
+    mounted: function () {
+      let self = this;
       Highcharts.setOptions({
         global: {
           useUTC: false
@@ -161,7 +213,12 @@
         var points2 = chart.series[1].points;
         var points3 = chart.series[2].points;
 //        console.log(points1);
-        chart.tooltip.refresh([points1[points1.length - 1], points2[points2.length - 1], points3[points3.length - 1]]);
+        let refresh_data = [points1[points1.length - 1], points2[points2.length - 1], points3[points3.length - 1]];
+        self.flow_all = Highcharts.numberFormat(refresh_data[0].y,2);
+        self.flow_tcp = Highcharts.numberFormat(refresh_data[1].y,2);
+        self.flow_udp = Highcharts.numberFormat(refresh_data[2].y,2);
+
+        chart.tooltip.refresh(refresh_data);
       }
 
       var chart = new Highcharts.chart('container', {
@@ -205,6 +262,16 @@
           }]
         },
         tooltip: {
+          formatter: function () {
+            var s = '<b>' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '</b>';
+
+            $.each(this.points, function () {
+              s += '<br/>' + this.series.name + ': ' +
+                Highcharts.numberFormat(this.y, 2) + ' Mbps';
+            });
+
+            return s;
+          },
           shared: true,
         },
         legend: {
@@ -216,62 +283,17 @@
         },
         series: [{
           name: '总流速',
-          data: (function () {
-            // generate an array of random data
-            var data = [],
-              time = (new Date()).getTime(),
-              i;
-            for (i = -19; i <= 0; i += 1) {
-              data.push({
-                x: time + i * 1000,
-                y: Math.random(),
-              });
-            }
-            return data;
-          }()),
-          tooltip: {
-            valueSuffix: ' Mbps',
-          },
+          data: self.series1[0],
           color: '#2196f3',
         },
           {
             name: 'TCP流速',
-            data: (function () {
-              // generate an array of random data
-              var data = [],
-                time = (new Date()).getTime(),
-                i;
-              for (i = -19; i <= 0; i += 1) {
-                data.push({
-                  x: time + i * 1000,
-                  y: Math.random(),
-                });
-              }
-              return data;
-            }()),
-            tooltip: {
-              valueSuffix: ' Mbps',
-            },
+            data: self.series2[0],
             color: 'red',
           },
           {
             name: 'UDP流速',
-            data: (function () {
-              // generate an array of random data
-              var data = [],
-                time = (new Date()).getTime(),
-                i;
-              for (i = -19; i <= 0; i += 1) {
-                data.push({
-                  x: time + i * 1000,
-                  y: Math.random(),
-                });
-              }
-              return data;
-            }()),
-            tooltip: {
-              valueSuffix: ' Mbps',
-            },
+            data: self.series3[0],
             color: '#4caf50',
           }
         ]
