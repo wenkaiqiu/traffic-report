@@ -11,27 +11,29 @@
   <div class="row">
     <div class="col-md-8">
       <div class="card">
-        <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#segment" role="tab">网段</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#application" role="tab">应用系统</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#ip" role="tab">IP会话</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#tcp" role="tab">TCP会话</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#udp" role="tab">UDP会话</a>
-          </li>
-        </ul>
+        <div class="card-head">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs nav-fill" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="tab" href="#segment" role="tab">网段</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#application" role="tab">应用系统</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#ip" role="tab">IP会话</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#tcp" role="tab">TCP会话</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#udp" role="tab">UDP会话</a>
+            </li>
+          </ul>
+        </div>
 
         <!-- Tab panes -->
-        <div class="tab-content">
+        <div class="card-body tab-content">
           <div class="tab-pane active" id="segment" role="tabpanel">...</div>
           <div class="tab-pane" id="application" role="tabpanel">...</div>
           <div class="tab-pane" id="ip" role="tabpanel">...</div>
@@ -261,18 +263,27 @@
         min-height: 56px
         vertical-align: middle
         border-radius: 2px 2px 0 0
-        header
-          display: inline-block
-          padding: 11px 24px
-          vertical-align: middle
-          line-height: 17px
-          font-size: 1.25rem
+        & > .nav-tabs > li > a
+          line-height: 54px
+          padding-top: 0
+          padding-bottom: 0
+          color: inherit
+          opacity: 0.55
+        & > .nav-tabs > li > a.active
+          border: none
+          border-bottom: 2px solid #0aa89e
+          color: #0aa89e
+          background-color: transparent
+          cursor: default
+          opacity: 1
+        & > .nav-tabs.nav-fill > a.active
+          border: none
+          border-bottom: 2px solid #0aa89e
       .card-body
         padding: 24px
         position: relative
         &:last-child
           border-radius: 0 0 2px 2px
-
     #master-container
       position: relative
       width: 100%
