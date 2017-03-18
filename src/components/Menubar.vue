@@ -2,22 +2,22 @@
   <div id="menubar" class="menubar-inverse animate">
 
     <ul id="main-menu" class="gui-controls">
-      <router-link tag="li" to="/real-time">
+      <router-link tag="li" to="/dashboard/real-time">
         <a><div class="gui-icon"><i class="md md-home"></i></div></a>
       </router-link>
-      <router-link tag="li" to="/flow-trend">
+      <router-link tag="li" to="/dashboard/flow-trend">
         <a><div class="gui-icon"><i class="md md-trending-up"></i></div></a>
       </router-link>
-      <router-link tag="li" to="/history-flow">
+      <router-link tag="li" to="/dashboard/history-flow">
         <a><div class="gui-icon"><i class="md md-poll"></i></div></a>
       </router-link>
-      <router-link tag="li" to="/data-package">
+      <router-link tag="li" to="/dashboard/data-package">
         <a><div class="gui-icon"><i class="md md-laptop-windows"></i></div></a>
       </router-link>
-      <router-link tag="li" to="/basic-management">
+      <router-link tag="li" to="/dashboard/basic-management">
         <a><div class="gui-icon"><i class="md md-settings"></i></div></a>
       </router-link>
-      <router-link tag="li" to="/configuration-management">
+      <router-link tag="li" to="/dashboard/configuration-management">
         <a><div class="gui-icon"><i class="md md-settings-applications"></i></div></a>
       </router-link>
     </ul>
@@ -30,7 +30,7 @@
   };
 </script>
 
-<style rel="stylesheet/sass" lang="sass">
+<style rel="stylesheet/sass" lang="sass" scoped>
   #menubar
     position: fixed
     z-index: 999

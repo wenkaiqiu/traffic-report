@@ -10,7 +10,7 @@
   };
 </script>
 
-<style rel="stylesheet/sass" lang="sass">
+<style rel="stylesheet/sass" lang="sass" scoped>
   #basic-management
 
 </style>
