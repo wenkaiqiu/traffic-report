@@ -118,8 +118,20 @@
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card">
-          <div id="pie-container"></div>
+        <div class="card d-flex flex-column">
+          <div class="d-flex flex-row">
+            <div class="mb-2 btn-group card-body" data-toggle="buttons">
+              <label role='button' class="btn btn-secondary active" @click="changePieData('package')" v-if="current_choice.pack_num">
+                <input type="radio" name="options" id="option1" checked> package
+              </label>
+              <label role='button' class="btn btn-secondary" @click="changePieData('flow')" v-if="current_choice.flow_count">
+                <input type="radio" name="options" id="option2"> flow
+              </label>
+            </div>
+          </div>
+          <div class="d-flex flex-row">
+            <div id="pie-container" style="width: 100%"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -131,6 +143,37 @@
   import Highcharts from 'highcharts';
   import { history_data, data_application, data_udp, data_tcp, data_ip, data_segments } from '../../static/data';
 
+  let enable = {
+    segments: {
+        name:true,
+      pack_num:true,
+      flow_count:true,
+    },
+    tcp: {
+      from:true,
+      to: true,
+      pack_num:true,
+      flow_count:true,
+    },
+    udp: {
+      from:true,
+      to: true,
+      pack_num:true,
+      flow_count:true,
+    },
+    ip: {
+        from:true,
+      to: true,
+      pack_num:true,
+      flow_count:true,
+    },
+    application: {
+      name: true,
+      protocol: true,
+      pack_num:true,
+      flow_count:true,
+    }
+  };
   export default {
     name: 'history-flow',
     data: function () {
@@ -139,36 +182,71 @@
       return {
         history: history_data,
         chart: null,
+        pie_chart: null,
         detailStart: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getDate()),
         detailEnd: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getDate() - 1),
         current_data: data_segments,
+        enable: enable,
+        current_choice: enable.segments,
+        current_tab: 'package',
       };
     },
     methods: {
+        changeChoice: function (item){
+            this.current_choice = item;
+        },
+        changePieData: function (item) {
+            const self = this;
+            let pie_data = [];
+            self.current_tab = item;
+            switch (item){
+              case 'package':
+                this.current_data.forEach(item=>{
+                  if(self.current_choice.name){
+                      pie_data.push([item.name, item.pack_num]);
+                  }else{
+                    pie_data.push([item.from+' -> ' +item.to, item.pack_num]);
+                  }
+                });
+                  break;
+              case 'flow':
+                this.current_data.forEach(item=>{
+                  if(self.current_choice.name){
+                    pie_data.push([item.name, item.flow_count]);
+                  }else{
+                    pie_data.push([item.from+' -> ' +item.to, item.flow_count]);
+                  }
+                });
+                  break;
+            }
+          console.log(pie_data);
+          self.pie_chart.series[0].setData(pie_data);
+        },
       changeData: function (item) {
         const self = this;
         switch (item) {
           case 'segment':
-//            self.chart.series[0].setData(data_segments);
+            self.changeChoice(enable.segments);
             self.current_data = data_segments;
             break;
           case 'application':
-//            self.chart.series[0].setData(data_application);
+            self.changeChoice(enable.application);
             self.current_data = data_application;
             break;
           case 'ip':
-//            self.chart.series[0].setData(data_ip);
+            self.changeChoice(enable.ip);
             self.current_data = data_ip;
             break;
           case 'udp':
-//            self.chart.series[0].setData(data_udp);
+            self.changeChoice(enable.udp);
             self.current_data = data_udp;
             break;
           case 'tcp':
-//            self.chart.series[0].setData(data_tcp);
+            self.changeChoice(enable.tcp);
             self.current_data = data_tcp;
             break;
         }
+        self.changePieData(self.current_tab);
       },
       createMaster: function () {
         const self = this;
@@ -292,7 +370,7 @@
         });
       },
       createPie: function () {
-        let pieChart = new Highcharts.chart('pie-container', {
+        this.pie_chart = new Highcharts.chart('pie-container', {
           chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -328,17 +406,17 @@
             type: 'pie',
             name: '各网段流量比',
             data: [
-              ['Firefox', 45.0],
-              ['IE', 26.8],
-              {
-                name: 'Chrome',
-                y: 12.8,
-                sliced: true,
-                selected: true
-              },
-              ['Safari', 8.5],
-              ['Opera', 6.2],
-              ['其他', 0.7]
+//              ['Firefox', 45.0],
+//              ['IE', 26.8],
+//              {
+//                name: 'Chrome',
+//                y: 12.8,
+//                sliced: true,
+//                selected: true
+//              },
+//              ['Safari', 8.5],
+//              ['Opera', 6.2],
+//              ['其他', 0.7]
             ]
           }]
         });
@@ -347,6 +425,7 @@
     mounted: function () {
       this.createMaster();
       this.createPie();
+      this.changeData('segment');
     }
   };
 </script>
