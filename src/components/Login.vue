@@ -21,16 +21,18 @@
               <br>
               <div class="d-flex flex-row justify-content-between">
                 <!--<div class="col-xs-6 text-left">-->
-                  <div class="checkbox checkbox-inline checkbox-styled">
-                    <label>
-                      <input type="checkbox"> <span>Remember me</span>
-                    </label>
-                  </div>
+                <div class="checkbox checkbox-inline checkbox-styled">
+                  <label>
+                    <input type="checkbox"> <span>Remember me</span>
+                  </label>
+                </div>
                 <!--</div>&lt;!&ndash;end .col &ndash;&gt;-->
                 <!--<div class="col-xs-6 text-right">-->
+                <router-link to="/dashboard/real-time">
                   <button role='button' class="btn btn-primary btn-raised" type="submit">
-                    <router-link to="/dashboard/real-time">Login</router-link>
+                    Login
                   </button>
+                </router-link>
                 <!--</div>&lt;!&ndash;end .col &ndash;&gt;-->
               </div><!--end .row -->
             </form>
