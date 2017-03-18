@@ -52,6 +52,14 @@
       },
       predictMon: function () {
         console.log("333333");
+        this.chart.series[0].setData(averages);
+        this.chart.series[1].setData(ranges);
+        this.chart.xAxis[0].update({
+          tickInterval: 7 * 24 * 60 * 60 * 1000,
+          dateTimeLabelFormats: {
+            week: '%Y-%m-%d'
+          }
+        });
       }
     },
     mounted: function () {

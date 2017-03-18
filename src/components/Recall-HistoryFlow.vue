@@ -9,131 +9,141 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-12">
         <div class="card">
-          <div class="card-head">
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs nav-fill" role="tablist">
-              <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#segment" role="tab" @click="changeData('segment')">网段</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#application" role="tab" @click="changeData('application')">应用系统</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#ip" role="tab" @click="changeData('ip')">IP会话</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tcp" role="tab" @click="changeData('tcp')">TCP会话</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#udp" role="tab" @click="changeData('udp')">UDP会话</a>
-              </li>
-            </ul>
-          </div>
+          <div class="row">
+            <div class="col-md-8">
 
-          <!-- Tab panes -->
-          <div class="card-body tab-content">
-            <div class="tab-pane active" id="segment" role="tabpanel">
-              <table class="table table-hover">
-                <thead class="thead-default">
-                <tr>
-                  <th>#</th>
-                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(item, index) in current_data">
-                  <th scope="row">{{index}}</th>
-                  <td v-for="value of item">{{value}}</td>
-                </tr>
-                </tbody>
-              </table>
+              <div class="card-head">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs nav-fill" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#segment" role="tab"
+                       @click="changeData('segment')">网段</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#application" role="tab"
+                       @click="changeData('application')">应用系统</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#ip" role="tab" @click="changeData('ip')">IP会话</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tcp" role="tab" @click="changeData('tcp')">TCP会话</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#udp" role="tab" @click="changeData('udp')">UDP会话</a>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Tab panes -->
+              <div class="card-body tab-content">
+                <div class="tab-pane active" id="segment" role="tabpanel">
+                  <table class="table table-hover">
+                    <thead class="thead-default">
+                    <tr>
+                      <th>#</th>
+                      <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in current_data">
+                      <th scope="row">{{index}}</th>
+                      <td v-for="value of item">{{value}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane" id="application" role="tabpanel">
+                  <table class="table table-hover">
+                    <thead class="thead-default">
+                    <tr>
+                      <th>#</th>
+                      <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in current_data">
+                      <th scope="row">{{index}}</th>
+                      <td v-for="value of item">{{value}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane" id="ip" role="tabpanel">
+                  <table class="table table-hover">
+                    <thead class="thead-default">
+                    <tr>
+                      <th>#</th>
+                      <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in current_data">
+                      <th scope="row">{{index}}</th>
+                      <td v-for="value of item">{{value}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane" id="tcp" role="tabpanel">
+                  <table class="table table-hover">
+                    <thead class="thead-default">
+                    <tr>
+                      <th>#</th>
+                      <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in current_data">
+                      <th scope="row">{{index}}</th>
+                      <td v-for="value of item">{{value}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane" id="ucp" role="tabpanel">
+                  <table class="table table-hover">
+                    <thead class="thead-default">
+                    <tr>
+                      <th>#</th>
+                      <th v-for="(value, key) of current_data[0]">{{key}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in current_data">
+                      <th scope="row">{{index}}</th>
+                      <td v-for="value of item">{{value}}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-            <div class="tab-pane" id="application" role="tabpanel">
-              <table class="table table-hover">
-                <thead class="thead-default">
-                <tr>
-                  <th>#</th>
-                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(item, index) in current_data">
-                  <th scope="row">{{index}}</th>
-                  <td v-for="value of item">{{value}}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="tab-pane" id="ip" role="tabpanel">
-              <table class="table table-hover">
-                <thead class="thead-default">
-                <tr>
-                  <th>#</th>
-                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(item, index) in current_data">
-                  <th scope="row">{{index}}</th>
-                  <td v-for="value of item">{{value}}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="tab-pane" id="tcp" role="tabpanel">
-              <table class="table table-hover">
-                <thead class="thead-default">
-                <tr>
-                  <th>#</th>
-                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(item, index) in current_data">
-                  <th scope="row">{{index}}</th>
-                  <td v-for="value of item">{{value}}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="tab-pane" id="ucp" role="tabpanel">
-              <table class="table table-hover">
-                <thead class="thead-default">
-                <tr>
-                  <th>#</th>
-                  <th v-for="(value, key) of current_data[0]">{{key}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(item, index) in current_data">
-                  <th scope="row">{{index}}</th>
-                  <td v-for="value of item">{{value}}</td>
-                </tr>
-                </tbody>
-              </table>
+            <div class="col-md-4">
+              <div class="d-flex flex-column">
+                <div class="d-flex flex-row">
+                  <div class="mb-2 btn-group card-head" data-toggle="buttons">
+                    <label role='button' class="btn btn-secondary active" @click="changePieData('package')"
+                           v-if="current_choice.pack_num">
+                      <input type="radio" name="options" id="option1" checked> package
+                    </label>
+                    <label role='button' class="btn btn-secondary" @click="changePieData('flow')"
+                           v-if="current_choice.flow_count">
+                      <input type="radio" name="options" id="option2"> flow
+                    </label>
+                  </div>
+                </div>
+                <div class="d-flex flex-row">
+                  <div id="pie-container" style="width: 100%"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card d-flex flex-column">
-          <div class="d-flex flex-row">
-            <div class="mb-2 btn-group card-body" data-toggle="buttons">
-              <label role='button' class="btn btn-secondary active" @click="changePieData('package')" v-if="current_choice.pack_num">
-                <input type="radio" name="options" id="option1" checked> package
-              </label>
-              <label role='button' class="btn btn-secondary" @click="changePieData('flow')" v-if="current_choice.flow_count">
-                <input type="radio" name="options" id="option2"> flow
-              </label>
-            </div>
-          </div>
-          <div class="d-flex flex-row">
-            <div id="pie-container" style="width: 100%"></div>
-          </div>
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
@@ -145,33 +155,33 @@
 
   let enable = {
     segments: {
-        name:true,
-      pack_num:true,
-      flow_count:true,
+      name: true,
+      pack_num: true,
+      flow_count: true,
     },
     tcp: {
-      from:true,
+      from: true,
       to: true,
-      pack_num:true,
-      flow_count:true,
+      pack_num: true,
+      flow_count: true,
     },
     udp: {
-      from:true,
+      from: true,
       to: true,
-      pack_num:true,
-      flow_count:true,
+      pack_num: true,
+      flow_count: true,
     },
     ip: {
-        from:true,
+      from: true,
       to: true,
-      pack_num:true,
-      flow_count:true,
+      pack_num: true,
+      flow_count: true,
     },
     application: {
       name: true,
       protocol: true,
-      pack_num:true,
-      flow_count:true,
+      pack_num: true,
+      flow_count: true,
     }
   };
   export default {
@@ -192,36 +202,36 @@
       };
     },
     methods: {
-        changeChoice: function (item){
-            this.current_choice = item;
-        },
-        changePieData: function (item) {
-            const self = this;
-            let pie_data = [];
-            self.current_tab = item;
-            switch (item){
-              case 'package':
-                this.current_data.forEach(item=>{
-                  if(self.current_choice.name){
-                      pie_data.push([item.name, item.pack_num]);
-                  }else{
-                    pie_data.push([item.from+' -> ' +item.to, item.pack_num]);
-                  }
-                });
-                  break;
-              case 'flow':
-                this.current_data.forEach(item=>{
-                  if(self.current_choice.name){
-                    pie_data.push([item.name, item.flow_count]);
-                  }else{
-                    pie_data.push([item.from+' -> ' +item.to, item.flow_count]);
-                  }
-                });
-                  break;
-            }
-          console.log(pie_data);
-          self.pie_chart.series[0].setData(pie_data);
-        },
+      changeChoice: function (item) {
+        this.current_choice = item;
+      },
+      changePieData: function (item) {
+        const self = this;
+        let pie_data = [];
+        self.current_tab = item;
+        switch (item) {
+          case 'package':
+            this.current_data.forEach(item => {
+              if (self.current_choice.name) {
+                pie_data.push([item.name, item.pack_num]);
+              } else {
+                pie_data.push([item.from + ' -> ' + item.to, item.pack_num]);
+              }
+            });
+            break;
+          case 'flow':
+            this.current_data.forEach(item => {
+              if (self.current_choice.name) {
+                pie_data.push([item.name, item.flow_count]);
+              } else {
+                pie_data.push([item.from + ' -> ' + item.to, item.flow_count]);
+              }
+            });
+            break;
+        }
+        console.log(pie_data);
+        self.pie_chart.series[0].setData(pie_data);
+      },
       changeData: function (item) {
         const self = this;
         switch (item) {
@@ -469,6 +479,9 @@
         & > .nav-tabs.nav-fill > a.active
           border: none
           border-bottom: 2px solid #0aa89e
+        &.btn-group
+          margin-top: 10px
+          min-height: 0px
       .card-body
         padding: 24px
         position: relative
