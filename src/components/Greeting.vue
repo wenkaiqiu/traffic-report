@@ -27,4 +27,5 @@
       position: relative
       padding-left: 64px
       padding-top: 64px
+      height: 100vh
 </style>

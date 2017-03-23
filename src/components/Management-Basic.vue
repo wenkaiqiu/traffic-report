@@ -1,6 +1,6 @@
 <template>
   <div id="basic-management">
-    <h1>Basic Data Management</h1>
+    <iframe id="Frame1" src="http://v4-alpha.getbootstrap.com/" allowTransparency="true" width="100%"></iframe>
   </div>
 </template>
 
@@ -12,5 +12,9 @@
 
 <style rel="stylesheet/sass" lang="sass" scoped>
   #basic-management
+    height: 100%
+    iframe
+      border-width: 0
+      height: 100%
 
 </style>

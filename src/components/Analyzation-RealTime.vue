@@ -306,6 +306,8 @@
 
 <style rel="stylesheet/sass" lang="sass" scoped>
   section
+    overflow: auto
+    height: 100%
     position: relative
     padding: 24px
     &:first-child

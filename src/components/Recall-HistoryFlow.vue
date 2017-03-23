@@ -262,109 +262,75 @@
         const self = this;
         self.chart = new Highcharts.chart('master-container', {
           chart: {
-            reflow: false, //浏览器大小变动时不刷新
-            borderWidth: 0,
-            backgroundColor: null,
-            marginLeft: 50,
-            marginRight: 20,
-            zoomType: 'x',
-            events: {
-              // listen to the selection event on the master chart to update the
-              // extremes of the detail chart
-              selection: function (event) {
-
-                let extremesObject = event.xAxis[0],
-                  min = extremesObject.min,
-                  max = extremesObject.max,
-                  xAxis = this.xAxis[0];
-
-                self.detailStart = extremesObject.min;
-                self.detailEnd = extremesObject.max;
-
-                // move the plot bands to reflect the new detail span
-                xAxis.removePlotBand('mask-before');
-                xAxis.addPlotBand({
-                  id: 'mask-before',
-                  from: Date.UTC(2014, 2, 18),
-                  to: min,
-                  color: 'rgba(0, 0, 0, 0.2)'
-                });
-                xAxis.removePlotBand('mask-after');
-                xAxis.addPlotBand({
-                  id: 'mask-after',
-                  from: max,
-                  to: Date.UTC(2017, 3, 17),
-                  color: 'rgba(0, 0, 0, 0.2)'
-                });
-                return false;
-              }
-            }
+            zoomType: 'x'
           },
           title: {
-            text: '历史流量趋势'
+            text: '历史流量图'
           },
           xAxis: {
             type: 'datetime',
-            showLastTickLabel: true,
-            minRange: 14 * 24 * 3600000, // fourteen days
-            plotBands: [{
-              id: 'mask-before',
-              from: Date.UTC(2014, 2, 18),
-              to: Date.UTC(2017, 0, 1),
-              color: 'rgba(0, 0, 0, 0.2)'
-            }],
-            title: {
-              text: null
+//            minRange: 24 * 3600000,
+            dateTimeLabelFormats: {
+              millisecond: '%H:%M:%S.%L',
+              second: '%H:%M:%S',
+              minute: '%H:%M',
+              hour: '%H:%M',
+              day: '%m-%d',
+              week: '%m-%d',
+              month: '%Y-%m',
+              year: '%Y'
             }
           },
-          yAxis: {
-            gridLineWidth: 0,
-            labels: {
-              enabled: false
-            },
-            title: {
-              text: 'Mbps'
-            },
-            min: 0.6,
-            showFirstLabel: false
-          },
           tooltip: {
+            dateTimeLabelFormats: {
+              millisecond: '%H:%M:%S.%L',
+              second: '%H:%M:%S',
+              minute: '%H:%M',
+              hour: '%H:%M',
+              day: '%Y-%m-%d',
+              week: '%m-%d',
+              month: '%Y-%m',
+              year: '%Y'
+            },
             formatter: function () {
               let point = this.point;
               return '<b>' + point.series.name + '</b><br/>' +
-                Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
-                Highcharts.numberFormat(point.y, 2) + ' Mbps';
+                  Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
+                  Highcharts.numberFormat(point.y, 2) + 'Mbps';
+            }
+          },
+          yAxis: {
+            title: {
+              text: 'Mbps'
             }
           },
           legend: {
             enabled: false
           },
-          credits: {
-            enabled: false
-          },
           plotOptions: {
-            series: {
+            area: {
               fillColor: {
-                linearGradient: [0, 0, 0, 70],
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
                 stops: [
                   [0, Highcharts.getOptions().colors[0]],
-                  [1, 'rgba(255,255,255,0)']
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
                 ]
               },
-              lineWidth: 1,
               marker: {
-                enabled: false,
-                states: {
-                  enabled: true,
-                  radius: 3,
-                }
+                radius: 2
               },
-              shadow: false,
+              lineWidth: 1,
               states: {
                 hover: {
                   lineWidth: 1
                 }
               },
+              threshold: null
             }
           },
           series: [{
@@ -374,9 +340,6 @@
             pointStart: Date.UTC(2014, 2, 18),
             data: self.history
           }],
-          exporting: {
-            enabled: false
-          }
         });
       },
       createPie: function () {
@@ -410,24 +373,12 @@
             verticalAlign: 'top',
             x: 0,
             y: 20,
-            layout: 'vertical'
+            layout: 'vertical',
           },
           series: [{
             type: 'pie',
             name: '各网段流量比',
-            data: [
-//              ['Firefox', 45.0],
-//              ['IE', 26.8],
-//              {
-//                name: 'Chrome',
-//                y: 12.8,
-//                sliced: true,
-//                selected: true
-//              },
-//              ['Safari', 8.5],
-//              ['Opera', 6.2],
-//              ['其他', 0.7]
-            ]
+            data: [],
           }]
         });
       }
@@ -444,6 +395,8 @@
   #history-flow
     position: relative
     padding: 24px
+    overflow: auto
+    height: 100%
     /*&:first-child*/
       /*padding-top: 0*/
     .card

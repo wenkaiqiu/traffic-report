@@ -119,6 +119,8 @@
   #real-time
     position: relative
     padding: 24px
+    overflow: auto
+    height: 100%
     .card
       position: relative
       margin-bottom: 24px

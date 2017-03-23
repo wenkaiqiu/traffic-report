@@ -12,5 +12,6 @@
 
 <style rel="stylesheet/sass" lang="sass" scoped>
   #configuration-management
-
+    overflow: auto
+    height: 100%
 </style>
