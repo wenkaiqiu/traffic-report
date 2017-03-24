@@ -154,7 +154,7 @@
         series1: [
           (function () {
             // generate an array of random data
-            var data = [],
+            let data = [],
               time = (new Date()).getTime(),
               i;
             for (i = -19; i <= 0; i += 1) {
@@ -169,7 +169,7 @@
         series2: [
           (function () {
             // generate an array of random data
-            var data = [],
+            let data = [],
               time = (new Date()).getTime(),
               i;
             for (i = -19; i <= 0; i += 1) {
@@ -184,7 +184,7 @@
         series3: [
           (function () {
             // generate an array of random data
-            var data = [],
+            let data = [],
               time = (new Date()).getTime(),
               i;
             for (i = -19; i <= 0; i += 1) {
@@ -201,104 +201,122 @@
         flow_tcp: 0,
       };
     },
-    mounted: function () {
-      let self = this;
-      Highcharts.setOptions({
-        global: {
-          useUTC: false
+    methods: {
+      createChart: function () {
+        const self = this;
+        Highcharts.setOptions({
+          global: {
+            useUTC: false
+          }
+        });
+        let activeLastPointToolip = (chart) => {
+          let points1 = chart.series[0].points;
+          let points2 = chart.series[1].points;
+          let points3 = chart.series[2].points;
+          let refresh_data = [points1[points1.length - 1], points2[points2.length - 1], points3[points3.length - 1]];
+          self.flow_all = Highcharts.numberFormat(refresh_data[0].y, 2);
+          self.flow_tcp = Highcharts.numberFormat(refresh_data[1].y, 2);
+          self.flow_udp = Highcharts.numberFormat(refresh_data[2].y, 2);
+
+          chart.tooltip.refresh(refresh_data);
         }
-      });
-      function activeLastPointToolip(chart) {
-        var points1 = chart.series[0].points;
-        var points2 = chart.series[1].points;
-        var points3 = chart.series[2].points;
-//        console.log(points1);
-        let refresh_data = [points1[points1.length - 1], points2[points2.length - 1], points3[points3.length - 1]];
-        self.flow_all = Highcharts.numberFormat(refresh_data[0].y,2);
-        self.flow_tcp = Highcharts.numberFormat(refresh_data[1].y,2);
-        self.flow_udp = Highcharts.numberFormat(refresh_data[2].y,2);
 
-        chart.tooltip.refresh(refresh_data);
-      }
-
-      var chart = new Highcharts.chart('container', {
-        chart: {
-          type: 'spline',
-          animation: Highcharts.svg, // don't animate in old IE
-          marginRight: 10,
-          events: {
-            load: function () {
-              // set up the updating of the chart each second
-              var series = this.series,
-                chart = this;
-              setInterval(function () {
-                var x = (new Date()).getTime(), // current time
-                  y1 = Math.random(),
-                  y2 = Math.random(),
-                  y3 = Math.random();
-                series[0].addPoint([x, y1], true, true);
-                series[1].addPoint([x, y2], true, true);
-                series[2].addPoint([x, y3], true, true);
-                activeLastPointToolip(chart)
-              }, 1000);
+        let chart = new Highcharts.chart('container', {
+          chart: {
+            type: 'spline',
+            animation: Highcharts.svg, // don't animate in old IE
+            marginRight: 10,
+            events: {
+              load: function () {
+                // set up the updating of the chart each second
+                let series = this.series,
+                  chart = this;
+                setInterval(function () {
+                  let x = (new Date()).getTime(), // current time
+                    y1 = Math.random(),
+                    y2 = Math.random(),
+                    y3 = Math.random();
+                  series[0].addPoint([x, y1], true, true);
+                  series[1].addPoint([x, y2], true, true);
+                  series[2].addPoint([x, y3], true, true);
+                  activeLastPointToolip(chart)
+                }, 1000);
+              }
             }
-          }
-        },
-        title: {
-          text: '流量实时统计'
-        },
-        xAxis: {
-          type: 'datetime',
-          tickPixelInterval: 150
-        },
-        yAxis: {
+          },
           title: {
-            text: 'Mbps'
+            text: '流量实时统计'
           },
-          plotLines: [{
-            value: 0,
-            width: 1,
-            color: '#808080'
-          }]
-        },
-        tooltip: {
-          formatter: function () {
-            var s = '<b>' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '</b>';
+          xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150
+          },
+          yAxis: {
+            title: {
+              text: 'Mbps'
+            },
+            plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#808080'
+            }]
+          },
+          tooltip: {
+            formatter: function () {
+              let s = '<b>' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '</b>';
 
-            $.each(this.points, function () {
-              s += '<br/>' + this.series.name + ': ' +
-                Highcharts.numberFormat(this.y, 2) + ' Mbps';
-            });
+              $.each(this.points, function () {
+                s += '<br/>' + this.series.name + ': ' +
+                  Highcharts.numberFormat(this.y, 2) + ' Mbps';
+              });
 
-            return s;
+              return s;
+            },
+            shared: true,
           },
-          shared: true,
-        },
-        legend: {
-          align: 'center',
-          itemDistance: 50
-        },
-        exporting: {
-          enabled: false
-        },
-        series: [{
-          name: '总流速',
-          data: self.series1[0],
-          color: '#2196f3',
-        },
-          {
-            name: 'TCP流速',
-            data: self.series2[0],
-            color: 'red',
+          legend: {
+            align: 'center',
+            itemDistance: 50
           },
-          {
-            name: 'UDP流速',
-            data: self.series3[0],
-            color: '#4caf50',
-          }
-        ]
-      }, function (c) {
-        activeLastPointToolip(c)
+          exporting: {
+            enabled: false
+          },
+          series: [{
+            name: '总流速',
+            data: self.series1[0],
+            color: '#2196f3',
+          },
+            {
+              name: 'TCP流速',
+              data: self.series2[0],
+              color: 'red',
+            },
+            {
+              name: 'UDP流速',
+              data: self.series3[0],
+              color: '#4caf50',
+            }
+          ]
+        }, function (c) {
+          activeLastPointToolip(c)
+        });
+      },
+
+      getData: function () {
+        const self = this;
+        const resource = self.$resource(process.env.DATA_REALTIME);
+        return resource.get().then(res => {
+          return res.data;
+        }).catch(err => {
+          console.error(err);
+        });
+      }
+    },
+    mounted: function () {
+      const self = this;
+      self.getData().then(res => {
+          console.log(res);
+        self.createChart();
       });
     },
   };
