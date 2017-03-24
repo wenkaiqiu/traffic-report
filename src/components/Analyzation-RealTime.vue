@@ -306,7 +306,7 @@
         const self = this;
         const resource = self.$resource(process.env.DATA_REALTIME);
         return resource.get().then(res => {
-          return res.data;
+          return res.data.sort((a, b) => (a.pk - b.pk));
         }).catch(err => {
           console.error(err);
         });
@@ -315,11 +315,13 @@
     mounted: function () {
       const self = this;
       self.getData().then(res => {
-          console.log(res);
+        console.log(res);
         self.createChart();
       });
-    },
-  };
+    }
+    ,
+  }
+  ;
 </script>
 
 <style rel="stylesheet/sass" lang="sass" scoped>
