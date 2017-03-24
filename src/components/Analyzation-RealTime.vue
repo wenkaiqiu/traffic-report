@@ -151,54 +151,14 @@
     name: 'flow-trend',
     data: function () {
       return {
-        series1: [
-          (function () {
-            // generate an array of random data
-            let data = [],
-              time = (new Date()).getTime(),
-              i;
-            for (i = -19; i <= 0; i += 1) {
-              data.push({
-                x: time + i * 1000,
-                y: Math.random(),
-              });
-            }
-            return data;
-          }()),
-        ],
-        series2: [
-          (function () {
-            // generate an array of random data
-            let data = [],
-              time = (new Date()).getTime(),
-              i;
-            for (i = -19; i <= 0; i += 1) {
-              data.push({
-                x: time + i * 1000,
-                y: Math.random(),
-              });
-            }
-            return data;
-          }()),
-        ],
-        series3: [
-          (function () {
-            // generate an array of random data
-            let data = [],
-              time = (new Date()).getTime(),
-              i;
-            for (i = -19; i <= 0; i += 1) {
-              data.push({
-                x: time + i * 1000,
-                y: Math.random(),
-              });
-            }
-            return data;
-          }()),
-        ],
+        series1: [],
+        series2: [],
+        series3: [],
         flow_all: 0,
         flow_udp: 0,
         flow_tcp: 0,
+        timer: null,
+        chart: null,
       };
     },
     methods: {
@@ -214,14 +174,14 @@
           let points2 = chart.series[1].points;
           let points3 = chart.series[2].points;
           let refresh_data = [points1[points1.length - 1], points2[points2.length - 1], points3[points3.length - 1]];
-          self.flow_all = Highcharts.numberFormat(refresh_data[0].y, 2);
-          self.flow_tcp = Highcharts.numberFormat(refresh_data[1].y, 2);
-          self.flow_udp = Highcharts.numberFormat(refresh_data[2].y, 2);
+          self.flow_all = Highcharts.numberFormat(refresh_data[0].y, 3);
+          self.flow_tcp = Highcharts.numberFormat(refresh_data[1].y, 3);
+          self.flow_udp = Highcharts.numberFormat(refresh_data[2].y, 3);
 
           chart.tooltip.refresh(refresh_data);
         }
 
-        let chart = new Highcharts.chart('container', {
+        self.chart = new Highcharts.chart('container', {
           chart: {
             type: 'spline',
             animation: Highcharts.svg, // don't animate in old IE
@@ -231,16 +191,57 @@
                 // set up the updating of the chart each second
                 let series = this.series,
                   chart = this;
-                setInterval(function () {
-                  let x = (new Date()).getTime(), // current time
-                    y1 = Math.random(),
-                    y2 = Math.random(),
-                    y3 = Math.random();
-                  series[0].addPoint([x, y1], true, true);
-                  series[1].addPoint([x, y2], true, true);
-                  series[2].addPoint([x, y3], true, true);
-                  activeLastPointToolip(chart)
-                }, 1000);
+
+                self.timer = setInterval(function () {
+                  let loc_data = self.getData().then(res => {
+                      console.log("start");
+                    let data_init = self.data2point(res);
+                    console.log("end");
+                    let s1 = data_init[0][0];
+                    let s2 = data_init[1][0];
+                    let s3 = data_init[2][0];
+                    series[0].addPoint([s1.x, s1.y], true, true);
+                    series[1].addPoint([s2.x, s2.y], true, true);
+                    series[2].addPoint([s3.x, s3.y], true, true);
+                    activeLastPointToolip(chart);
+                    setTimeout(function () {
+                      let s1 = data_init[0][1];
+                      let s2 = data_init[1][1];
+                      let s3 = data_init[2][1];
+                      series[0].addPoint([s1.x, s1.y], true, true);
+                      series[1].addPoint([s2.x, s2.y], true, true);
+                      series[2].addPoint([s3.x, s3.y], true, true);
+                      activeLastPointToolip(chart);
+                    }, 1000);
+                    setTimeout(function () {
+                      let s1 = data_init[0][2];
+                      let s2 = data_init[1][2];
+                      let s3 = data_init[2][2];
+                      series[0].addPoint([s1.x, s1.y], true, true);
+                      series[1].addPoint([s2.x, s2.y], true, true);
+                      series[2].addPoint([s3.x, s3.y], true, true);
+                      activeLastPointToolip(chart);
+                    }, 2000);
+                    setTimeout(function () {
+                      let s1 = data_init[0][3];
+                      let s2 = data_init[1][3];
+                      let s3 = data_init[2][3];
+                      series[0].addPoint([s1.x, s1.y], true, true);
+                      series[1].addPoint([s2.x, s2.y], true, true);
+                      series[2].addPoint([s3.x, s3.y], true, true);
+                      activeLastPointToolip(chart);
+                    }, 3000);
+                    setTimeout(function () {
+                      let s1 = data_init[0][4];
+                      let s2 = data_init[1][4];
+                      let s3 = data_init[2][4];
+                      series[0].addPoint([s1.x, s1.y], true, true);
+                      series[1].addPoint([s2.x, s2.y], true, true);
+                      series[2].addPoint([s3.x, s3.y], true, true);
+                      activeLastPointToolip(chart);
+                    }, 4000);
+                  });
+                }, 5000)
               }
             }
           },
@@ -253,7 +254,7 @@
           },
           yAxis: {
             title: {
-              text: 'Mbps'
+              text: 'Kbps'
             },
             plotLines: [{
               value: 0,
@@ -267,7 +268,7 @@
 
               $.each(this.points, function () {
                 s += '<br/>' + this.series.name + ': ' +
-                  Highcharts.numberFormat(this.y, 2) + ' Mbps';
+                  Highcharts.numberFormat(this.y, 3) + ' Kbps';
               });
 
               return s;
@@ -283,17 +284,17 @@
           },
           series: [{
             name: '总流速',
-            data: self.series1[0],
+            data: self.series1,
             color: '#2196f3',
           },
             {
               name: 'TCP流速',
-              data: self.series2[0],
+              data: self.series2,
               color: 'red',
             },
             {
               name: 'UDP流速',
-              data: self.series3[0],
+              data: self.series3,
               color: '#4caf50',
             }
           ]
@@ -306,20 +307,53 @@
         const self = this;
         const resource = self.$resource(process.env.DATA_REALTIME);
         return resource.get().then(res => {
-          return res.data.sort((a, b) => (a.pk - b.pk));
+          return res.data.sort((a, b) => (b.pk - a.pk));
         }).catch(err => {
           console.error(err);
         });
-      }
+      },
+
+      data2point: function (data, num=1) {
+        const self = this;
+        let res = [[], [], []];
+        console.log("-------------------------data2point-------------------------------");
+        for(let i=num-1;i>=0;i--) {
+          let item = data[i];
+          console.log(item.pk);
+          let loc_time = new Date(item.fields.pick_time).getTime();
+          for (let j = -4; j <= 0; j++) {
+            res[0].push({
+              x: loc_time + j * 1000,
+              y: item.fields.bytes / 5 / 1024
+            });
+            res[1].push({
+              x: loc_time + j * 1000,
+              y: item.fields.tcp_bytes / 5 / 1024
+            });
+            res[2].push({
+              x: loc_time + j * 1000,
+              y: item.fields.udp_bytes / 5 / 1024
+            });
+          }
+        }
+        console.log("-------------------------data2point end-------------------------------");
+        return res;
+      },
     },
     mounted: function () {
       const self = this;
       self.getData().then(res => {
         console.log(res);
+//        //初始化图表，只初始化20s的数据
+        let data_init = self.data2point(res,4);
+        console.log("-------1-------")
+        self.series1 = self.series1.concat(data_init[0]);
+        self.series2 = self.series2.concat(data_init[1]);
+        self.series3 = self.series3.concat(data_init[2]);
         self.createChart();
+        console.log("-------2-------")
       });
-    }
-    ,
+    },
   }
   ;
 </script>
