@@ -365,6 +365,9 @@
         self.createChart();
       });
     },
+    destroyed: function () {
+      clearInterval(this.timer);
+    }
   }
   ;
 </script>

@@ -40,10 +40,15 @@
     width: 64px
     color: rgba(255, 255, 255, 0.55)
     background: #2b323a
+    padding-top: 16px
     #main-menu
       overflow-x: hidden
   .gui-controls
     padding: 0
+    li.router-link-active .gui-icon
+      background-color: #ffffff
+      border-color: #ffffff
+      color: #0aa89e
     & > li
       position: relative
       margin-bottom: 12px
@@ -72,6 +77,9 @@
       -webkit-transition: all 0.15s linear
       -o-transition: all 0.15s linear
       transition: all 0.15s linear
+      &:hover
+        background-color: rgba(255, 255, 255, 0.12)
+        color: #ffffff
       .md:first-child
         position: absolute
         left: 0
