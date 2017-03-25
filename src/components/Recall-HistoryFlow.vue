@@ -2,7 +2,25 @@
   <div id="history-flow">
     <div class="row">
       <div class="col-md-12">
-        <div class="card">
+        <div class="card d-flex flex-column">
+          <div class="chart-menubar d-flex flex-row">
+            <div class="btn-group col-3 d-flex flex-row" role="group" aria-label="Basic example">
+              <span class="my-span mr-sm-2">时间间隔</span>
+              <button role="button" type="button" class="btn btn-secondary">min</button>
+              <button role="button" type="button" class="btn btn-secondary">h</button>
+              <button role="button" type="button" class="btn btn-secondary">day</button>
+            </div>
+            <div class="form-inline col-9">
+              <label for="time-start" class="mr-sm-2">开始时间</label>
+              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="datetime-local" value="2017-03-01T13:45:00"
+                     id="time-start">
+              <label for="time-end" class="mr-sm-2">结束时间</label>
+              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="datetime-local" value="2017-03-31T13:45:00"
+                     id="time-end">
+              <button role="button" type="button" class="btn btn-primary mr-sm-2">更新</button>
+              <button role="button" type="button" class="btn btn-secondary">下载日志</button>
+            </div>
+          </div>
           <div id="master-container" style="height:400px">
           </div>
         </div>
@@ -295,8 +313,8 @@
             formatter: function () {
               let point = this.point;
               return '<b>' + point.series.name + '</b><br/>' +
-                  Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
-                  Highcharts.numberFormat(point.y, 2) + 'Mbps';
+                Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
+                Highcharts.numberFormat(point.y, 2) + 'Mbps';
             }
           },
           yAxis: {
@@ -410,6 +428,13 @@
         border-radius: 0 0 2px 2px
       & > .nano:last-child
         border-radius: 0 0 2px 2px
+      .chart-menubar
+        padding-left: 30px
+        padding-top: 16px
+        height: 60px
+        .my-sapn
+          align-items: center
+          display: flex
       .card-head
         position: relative
         line-height: 52px
