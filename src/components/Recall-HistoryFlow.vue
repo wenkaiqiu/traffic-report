@@ -36,8 +36,8 @@
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs nav-fill" role="tablist">
                   <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#segment" role="tab"
-                       @click="changeData('segment')">网段</a>
+                    <a class="nav-link active" data-toggle="tab" href="#endpoint" role="tab"
+                       @click="changeData('endpoint')">终端</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#application" role="tab"
@@ -57,7 +57,7 @@
 
               <!-- Tab panes -->
               <div class="card-body tab-content">
-                <div class="tab-pane active" id="segment" role="tabpanel">
+                <div class="tab-pane active" id="endpoint" role="tabpanel">
                   <table class="table table-hover">
                     <thead class="thead-default">
                     <tr>
@@ -169,10 +169,10 @@
 <script>
   import $ from 'jquery';
   import Highcharts from 'highcharts';
-  import { history_data, data_application, data_udp, data_tcp, data_ip, data_segments } from '../../static/data';
+  import { history_data, data_application, data_udp, data_tcp, data_ip, data_endpoint } from '../../static/data';
 
   let enable = {
-    segments: {
+    endpoint: {
       name: true,
       pack_num: true,
       flow_count: true,
@@ -213,9 +213,9 @@
         pie_chart: null,
         detailStart: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getDate()),
         detailEnd: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getDate() - 1),
-        current_data: data_segments,
+        current_data: data_endpoint,
         enable: enable,
-        current_choice: enable.segments,
+        current_choice: enable.endpoint,
         current_tab: 'package',
       };
     },
@@ -253,9 +253,9 @@
       changeData: function (item) {
         const self = this;
         switch (item) {
-          case 'segment':
-            self.changeChoice(enable.segments);
-            self.current_data = data_segments;
+          case 'endpoint':
+            self.changeChoice(enable.endpoint);
+            self.current_data = data_endpoint;
             break;
           case 'application':
             self.changeChoice(enable.application);

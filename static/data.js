@@ -195,7 +195,7 @@ export var averages_week = [
   [1246838400000, 21.3],
   [1246924800000, 18.3]
 ];
-export var data_segments = [
+export var data_endpoint = [
   {
     name:'127.0.1.0',
     pack_num: 12,
