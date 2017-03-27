@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "bootstrap": "^4.0.0-alpha.6",
+    "datatables.net": "^1.10.13",
+    "datatables.net-bs4": "^1.10.13",
     "highcharts": "^5.0.9",
     "vue": "^2.2.2",
     "vue-resource": "^1.2.1",
