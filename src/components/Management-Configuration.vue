@@ -47,8 +47,8 @@
             </div>
             <div class="card-body height-4">
               <div class="d-flex flex-row justify-content-around">
-                <button role="button" type="button" class="btn btn-danger btn-lg col-3">暂停</button>
-                <button role="button" type="button" class="btn btn-success col-3">开始</button>
+                <button role="button" type="button" class="btn btn-danger btn-lg col-3" v-bind:disabled="isPause?true:flase">暂停</button>
+                <button role="button" type="button" class="btn btn-success col-3" v-bind:disabled="!isPause?true:flase">开始</button>
               </div><!-- end .d-flex -->
             </div>
           </div>
@@ -69,6 +69,7 @@
         current_time: new Date().toLocaleString(),
         bpf: "",
         running_status: 0,
+        isPause: true,
       };
     },
     computed: {

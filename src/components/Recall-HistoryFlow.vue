@@ -4,8 +4,8 @@
       <div class="row justify-content-center p-2">
         <h2>历史流量分析</h2>
         <!--<form method="post" action="http://10.5.0.224:8000/rest/download_pcap/" target="_blank">-->
-          <!--<input type="text" name="file_path" value="/tmp/tmp8g4gr_fu.pcap"/>-->
-          <!--<input type="submit" value="Submit"/>-->
+        <!--<input type="text" name="file_path" value="/tmp/tmp8g4gr_fu.pcap"/>-->
+        <!--<input type="submit" value="Submit"/>-->
         <!--</form>-->
       </div>
       <div class="row">
@@ -146,9 +146,11 @@
               <div class="btn-group" role="group">
                 <button role='button' type="button" class="btn btn-secondary"
                         v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">Flow
+
                 </button>
                 <button role='button' type="button" class="btn btn-secondary"
                         v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">Packet
+
                 </button>
               </div>
               <div class="d-flex flex-row" v-if="hasPartition">
@@ -189,58 +191,58 @@
   import bs4 from 'datatables.net-bs4';
   import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
 
-  import{ history_data } from '../../static/data';
+  import{history_data} from '../../static/data';
 
-  function    formatIP(ip){
-        let ret = '' + ip & 255;
-        for (let i = 1; i < 4; i++)
-          ret = '' + ((ip >> (i * 8)) & 255) + '.' + ret;
-        return ret;
-      };
+  function formatIP(ip) {
+    let ret = '' + ip & 255;
+    for (let i = 1; i < 4; i++)
+      ret = '' + ((ip >> (i * 8)) & 255) + '.' + ret;
+    return ret;
+  };
   const columns_type = {
     'endpoint': [
-      { "data": "ip" },
-      { "data": "ip_node" },
-      { "data": "rx" },
-      { "data": "tx" },
-      { "data": "rx_packets" },
-      { "data": "tx_packets" },
+      {"data": "ip"},
+      {"data": "ip_node"},
+      {"data": "rx"},
+      {"data": "tx"},
+      {"data": "rx_packets"},
+      {"data": "tx_packets"},
     ],
     'application': [
-      { "data": "protocol" },
-      { "data": "bytes" },
-      { "data": "packets" },
+      {"data": "protocol"},
+      {"data": "bytes"},
+      {"data": "packets"},
     ],
     'ip': [
-      { "data": "left" },
-      { "data": "left_node" },
-      { "data": "right" },
-      { "data": "right_node" },
-      { "data": "rx" },
-      { "data": "tx" },
-      { "data": "rx_packets" },
-      { "data": "tx_packets" },
-      { "data": "ip_type" },
+      {"data": "left"},
+      {"data": "left_node"},
+      {"data": "right"},
+      {"data": "right_node"},
+      {"data": "rx"},
+      {"data": "tx"},
+      {"data": "rx_packets"},
+      {"data": "tx_packets"},
+      {"data": "ip_type"},
     ],
     'tcp': [
-      { "data": "left" },
-      { "data": "left_node" },
-      { "data": "right" },
-      { "data": "right_node" },
-      { "data": "rx" },
-      { "data": "tx" },
-      { "data": "rx_packets" },
-      { "data": "tx_packets" },
+      {"data": "left"},
+      {"data": "left_node"},
+      {"data": "right"},
+      {"data": "right_node"},
+      {"data": "rx"},
+      {"data": "tx"},
+      {"data": "rx_packets"},
+      {"data": "tx_packets"},
     ],
     'udp': [
-      { "data": "left" },
-      { "data": "left_node" },
-      { "data": "right" },
-      { "data": "right_node" },
-      { "data": "rx" },
-      { "data": "tx" },
-      { "data": "rx_packets" },
-      { "data": "tx_packets" },
+      {"data": "left"},
+      {"data": "left_node"},
+      {"data": "right"},
+      {"data": "right_node"},
+      {"data": "rx"},
+      {"data": "tx"},
+      {"data": "rx_packets"},
+      {"data": "tx_packets"},
     ],
   };
   const ajax_process = {
@@ -540,7 +542,7 @@
           "columns": columns_type[type],
         });
         $("#table_" + self.data_type + "_wrapper").addClass('flex-column');
-        $("#table_local_filter input[type=search]").css({ width: "auto" });//右上角的默认搜索文本框，不写这个就超出去了。
+        $("#table_local_filter input[type=search]").css({width: "auto"});//右上角的默认搜索文本框，不写这个就超出去了。
         $("div.col-xs-12").addClass('col-12');
       },
       reloadTable: function () {
@@ -556,7 +558,7 @@
           title: {
             text: '历史流量图'
           },
-          credits: { enabled: false },
+          credits: {enabled: false},
           xAxis: {
             type: 'datetime',
 //            minRange: 24 * 3600000,
@@ -796,7 +798,7 @@
       },
       setPieData: function () {
         const self = this;
-        self.pie.setTitle({ text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比' })
+        self.pie.setTitle({text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比'})
         self.pie.series[0].setData(self.data_pie);
       },
       //reload不改变当前状态，只重新处理新的数据并更新图表
@@ -816,7 +818,7 @@
             plotBorderWidth: null,
             plotShadow: false
           },
-          credits: { enabled: false },
+          credits: {enabled: false},
           title: {
             text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比'
           },
@@ -873,8 +875,8 @@
 ////          }
 //        });
         //方法1
-        result_resource.save({'file_path': "/tmp/tmp8g4gr_fu.pcap"}).then(res=>{
-            console.log(res);
+        result_resource.save({'file_path': "/tmp/tmp8g4gr_fu.pcap"}).then(res => {
+          console.log(res);
         });
         //方法2
         $("#downloadform").remove();
