@@ -3,6 +3,10 @@
     <div class="card">
       <div class="row justify-content-center p-2">
         <h2>历史流量分析</h2>
+        <!--<form method="post" action="http://10.5.0.224:8000/rest/download_pcap/" target="_blank">-->
+          <!--<input type="text" name="file_path" value="/tmp/tmp8g4gr_fu.pcap"/>-->
+          <!--<input type="submit" value="Submit"/>-->
+        <!--</form>-->
       </div>
       <div class="row">
         <div class="col-md-12 ">
@@ -22,12 +26,14 @@
               <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" v-model="end_time"
                      id="time-end">
               <button role="button" type="button" class="btn btn-primary mr-sm-2" v-on:click="changeTime()">更新</button>
-              <button role="button" type="button" class="btn btn-secondary">下载日志</button>
+              <button role="button" type="button" class="btn btn-secondary" @click="downloadHistory()">下载流量记录</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="row"></div>
+      <div class="row">
+        <div id="master-container" class="col-12" style="height:400px"></div>
+      </div>
       <div class="row">
         <div class="col-md-8">
           <div class="card-head">
@@ -183,6 +189,14 @@
   import bs4 from 'datatables.net-bs4';
   import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
 
+  import{ history_data } from '../../static/data';
+
+  function    formatIP(ip){
+        let ret = '' + ip & 255;
+        for (let i = 1; i < 4; i++)
+          ret = '' + ((ip >> (i * 8)) & 255) + '.' + ret;
+        return ret;
+      };
   const columns_type = {
     'endpoint': [
       { "data": "ip" },
@@ -236,7 +250,7 @@
         "tx": item.tx,
         "rx_packets": item.rx_packets,
         "tx_packets": item.tx_packets,
-        "ip": self.formatIP(item.ip),
+        "ip": formatIP(item.ip),
         "ip_node": item.ip_node,
       };
     },
@@ -253,9 +267,9 @@
         "tx": item.tx,
         "rx_packets": item.rx_packets,
         "tx_packets": item.tx_packets,
-        "left": self.formatIP(item.left),
+        "left": formatIP(item.left),
         "left_node": item.left_node,
-        "right": self.formatIP(item.right),
+        "right": formatIP(item.right),
         "right_node": item.right_node,
         'ip_type': (item.ip_type == 44) ? 'TCP' : ((item.ip_type == 45) ? 'UDP' : '空'),
       };
@@ -266,9 +280,9 @@
         "tx": item.tx,
         "rx_packets": item.rx_packets,
         "tx_packets": item.tx_packets,
-        "left": self.formatIP(item.left),
+        "left": formatIP(item.left),
         "left_node": item.left_node,
-        "right": self.formatIP(item.right),
+        "right": formatIP(item.right),
         "right_node": item.right_node,
       };
     },
@@ -278,9 +292,9 @@
         "tx": item.tx,
         "rx_packets": item.rx_packets,
         "tx_packets": item.tx_packets,
-        "left": self.formatIP(item.left),
+        "left": formatIP(item.left),
         "left_node": item.left_node,
-        "right": self.formatIP(item.right),
+        "right": formatIP(item.right),
         "right_node": item.right_node,
       };
     },
@@ -325,11 +339,13 @@
         pie_choice: null,
         data_filtered: [],
         data_pie: [],
+        data_history: history_data,
       };
     },
     methods: {
       init: function () {
         const self = this;
+        self.createMaster();
         //0.自定义DataTable
         self.customDataTable();
         //1. 初始化起止时间：最近一天
@@ -395,12 +411,6 @@
       formatMon(mon){
         return '' + Math.floor(mon / 10) + mon % 10;
       },
-      formatIP(ip){
-        let ret = '' + ip & 255;
-        for (let i = 1; i < 4; i++)
-          ret = '' + ((ip >> (i * 8)) & 255) + '.' + ret;
-        return ret;
-      },
       getURL: function (type) {
         const self = this;
         let loc_url = '';
@@ -461,14 +471,13 @@
         //由于v-model将数据与dom元素绑定，不需传入参数或手动赋值
         console.log(self.start_time);
         self.reloadTable();
-        self.reloadPie();
+//        self.reloadPie();//由于ajax的异步问题，reload资料datatable的ajax属性中调用
       },
       //更改显示的数据内容
       changeType: function (type) {
         const self = this;
         self.data_type = type;
         self.createTable(self.data_type);
-        self.createPie(self.data_type);
       },
       changeChoice: function (type) {
         const self = this;
@@ -521,8 +530,9 @@
               else if (self.data_type === 'udp')
                 loc_data = json.filter(item => item.ip_type == 45);
               let res = loc_data.map(ajax_process[type]);
-              console.log(res);
+//              console.log(res);
               self.data_table = res;//为饼图提供数据
+              self.createPie(self.data_type);
               console.log("---------------");
               return res;
             },
@@ -532,11 +542,95 @@
         $("#table_" + self.data_type + "_wrapper").addClass('flex-column');
         $("#table_local_filter input[type=search]").css({ width: "auto" });//右上角的默认搜索文本框，不写这个就超出去了。
         $("div.col-xs-12").addClass('col-12');
-        console.log($("div.col-xs-12"));
       },
       reloadTable: function () {
         const self = this;
         self.table.ajax.url(self.getURL(self.data_type)).load();
+      },
+      createMaster: function () {
+        const self = this;
+        self.master = new Highcharts.chart('master-container', {
+          chart: {
+            zoomType: 'x'
+          },
+          title: {
+            text: '历史流量图'
+          },
+          credits: { enabled: false },
+          xAxis: {
+            type: 'datetime',
+//            minRange: 24 * 3600000,
+            dateTimeLabelFormats: {
+              millisecond: '%H:%M:%S.%L',
+              second: '%H:%M:%S',
+              minute: '%H:%M',
+              hour: '%H:%M',
+              day: '%m-%d',
+              week: '%m-%d',
+              month: '%Y-%m',
+              year: '%Y'
+            }
+          },
+          tooltip: {
+            dateTimeLabelFormats: {
+              millisecond: '%H:%M:%S.%L',
+              second: '%H:%M:%S',
+              minute: '%H:%M',
+              hour: '%H:%M',
+              day: '%Y-%m-%d',
+              week: '%m-%d',
+              month: '%Y-%m',
+              year: '%Y'
+            },
+            formatter: function () {
+              let point = this.point;
+              return '<b>' + point.series.name + '</b><br/>' +
+                Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
+                Highcharts.numberFormat(point.y, 2) + 'Mbps';
+            }
+          },
+          yAxis: {
+            title: {
+              text: 'Mbps'
+            }
+          },
+          legend: {
+            enabled: false
+          },
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+          series: [{
+            type: 'area',
+            name: '流速',
+            pointInterval: 24 * 3600 * 1000,
+            pointStart: Date.UTC(2014, 2, 18),
+            data: self.data_history
+          }],
+        });
       },
       createPie: function () {
         const self = this;
@@ -686,14 +780,15 @@
             break;
         }
         console.log('hasPartition: ' + self.hasPartition);
+        console.log('partition: ' + self.partition_type);
         //过滤数据
         let loc_data = null;
         if (self.hasPartition) {
-          self.data_pie = self.data_filtered.map(data => {
+          loc_data = self.data_filtered.map(data => {
             return [data.name, data[self.partition_type]];
           });
         } else {
-          self.data_pie = self.data_filtered.map(data => {
+          loc_data = self.data_filtered.map(data => {
             return [data.name, data['total']];
           });
         }
@@ -701,7 +796,6 @@
       },
       setPieData: function () {
         const self = this;
-        console.log(self.data_pie);
         self.pie.setTitle({ text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比' })
         self.pie.series[0].setData(self.data_pie);
       },
@@ -722,6 +816,7 @@
             plotBorderWidth: null,
             plotShadow: false
           },
+          credits: { enabled: false },
           title: {
             text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比'
           },
@@ -754,6 +849,49 @@
             data: [],
           }]
         });
+      },
+      downloadHistory: function () {
+        const self = this;
+//        let id_resource = self.$resource(process.env.ID_PCAP);
+//        let url_resource = self.$resource(process.env.INFO_PCAP);
+        let result_resource = self.$resource(process.env.FILE_PCAP);
+//
+//        let task_id = id_resource.get({ start_time: self.start_time, end_time: self.end_time })
+//          .then(res => {
+//            console.log(res);
+//            console.log(res.data);
+//            return res.data;
+//          })
+//          .catch(err => {
+//            console.error(err);
+//          });
+//        task_id.then(res=>{
+//          let finished = false;
+//          let res_url;
+////          for(!finished) {
+////            task_id.then();
+////          }
+//        });
+        //方法1
+        result_resource.save({'file_path': "/tmp/tmp8g4gr_fu.pcap"}).then(res=>{
+            console.log(res);
+        });
+        //方法2
+        $("#downloadform").remove();
+        var form = $("<form>");//定义一个form表单
+        form.attr("id", "downloadform");
+        form.attr("style", "display:none");
+        form.attr("target", "_blank");
+        form.attr("method", "post");
+        form.attr("action", "http://10.5.0.224:8000/rest/download_pcap/");
+        var input1 = $("<input>");
+        input1.attr("type", "text");
+        input1.attr("name", "file_path");
+        input1.attr("value", "/tmp/tmp8g4gr_fu.pcap");
+        form.append(input1);
+        $("body").append(form);//将表单放置在web中
+
+        form.submit();//表单提交
       },
     },
     mounted: function () {
