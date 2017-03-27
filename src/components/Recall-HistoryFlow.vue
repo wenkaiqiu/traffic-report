@@ -22,12 +22,14 @@
               <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" v-model="end_time"
                      id="time-end">
               <button role="button" type="button" class="btn btn-primary mr-sm-2" v-on:click="changeTime()">更新</button>
-              <button role="button" type="button" class="btn btn-secondary">下载日志</button>
+              <button role="button" type="button" class="btn btn-secondary" @click="downloadHistory()">下载流量记录</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="row"></div>
+      <div class="row">
+        <div id="master-container" class="col-12" style="height:400px"></div>
+      </div>
       <div class="row">
         <div class="col-md-8">
           <div class="card-head">
@@ -183,6 +185,8 @@
   import bs4 from 'datatables.net-bs4';
   import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
 
+  import{ history_data } from '../../static/data';
+
   const columns_type = {
     'endpoint': [
       { "data": "ip" },
@@ -325,11 +329,13 @@
         pie_choice: null,
         data_filtered: [],
         data_pie: [],
+        data_history: history_data,
       };
     },
     methods: {
       init: function () {
         const self = this;
+        self.createMaster();
         //0.自定义DataTable
         self.customDataTable();
         //1. 初始化起止时间：最近一天
@@ -538,6 +544,91 @@
         const self = this;
         self.table.ajax.url(self.getURL(self.data_type)).load();
       },
+      createMaster: function () {
+        const self = this;
+        self.master = new Highcharts.chart('master-container', {
+          chart: {
+            zoomType: 'x'
+          },
+          title: {
+            text: '历史流量图'
+          },
+          credits: { enabled: false },
+          xAxis: {
+            type: 'datetime',
+//            minRange: 24 * 3600000,
+            dateTimeLabelFormats: {
+              millisecond: '%H:%M:%S.%L',
+              second: '%H:%M:%S',
+              minute: '%H:%M',
+              hour: '%H:%M',
+              day: '%m-%d',
+              week: '%m-%d',
+              month: '%Y-%m',
+              year: '%Y'
+            }
+          },
+          tooltip: {
+            dateTimeLabelFormats: {
+              millisecond: '%H:%M:%S.%L',
+              second: '%H:%M:%S',
+              minute: '%H:%M',
+              hour: '%H:%M',
+              day: '%Y-%m-%d',
+              week: '%m-%d',
+              month: '%Y-%m',
+              year: '%Y'
+            },
+            formatter: function () {
+              let point = this.point;
+              return '<b>' + point.series.name + '</b><br/>' +
+                Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
+                Highcharts.numberFormat(point.y, 2) + 'Mbps';
+            }
+          },
+          yAxis: {
+            title: {
+              text: 'Mbps'
+            }
+          },
+          legend: {
+            enabled: false
+          },
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+          series: [{
+            type: 'area',
+            name: '流速',
+            pointInterval: 24 * 3600 * 1000,
+            pointStart: Date.UTC(2014, 2, 18),
+            data: self.data_history
+          }],
+        });
+      },
       createPie: function () {
         const self = this;
         //先设置属性，再创建饼图对象，再向其添加数据
@@ -722,6 +813,7 @@
             plotBorderWidth: null,
             plotShadow: false
           },
+          credits: { enabled: false },
           title: {
             text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比'
           },
@@ -754,6 +846,45 @@
             data: [],
           }]
         });
+      },
+      downloadHistory: function () {
+        const self = this;
+//        let id_resource = self.$resource(process.env.ID_PCAP);
+//        let url_resource = self.$resource(process.env.INFO_PCAP);
+//        let result_resource = self.$resource(process.env.FILE_PCAP);
+//
+//        let task_id = id_resource.get({ start_time: self.start_time, end_time: self.end_time })
+//          .then(res => {
+//            console.log(res);
+//            console.log(res.data);
+//            return res.data;
+//          })
+//          .catch(err => {
+//            console.error(err);
+//          });
+//        task_id.then(res=>{
+//          let finished = false;
+//          let res_url;
+////          for(!finished) {
+////            task_id.then();
+////          }
+//        });
+
+        $("#downloadform").remove();
+        var form = $("<form>");//定义一个form表单
+        form.attr("id", "downloadform");
+        form.attr("style", "display:none");
+        form.attr("target", "");
+        form.attr("method", "post");
+        form.attr("action", "http://http://10.5.0.224:8000/rest/download_pcap");
+        var input1 = $("<input>");
+        input1.attr("type", "hidden");
+        input1.attr("name", "file_path");
+        input1.attr("value", "/tmp/tmp8g4gr_fu.pcap");
+        form.append(input1);
+        $("body").append(form);//将表单放置在web中
+
+        form.submit();//表单提交
       },
     },
     mounted: function () {
