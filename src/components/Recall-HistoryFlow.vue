@@ -41,23 +41,23 @@
             <ul class="nav nav-tabs nav-fill" role="tablist">
               <li class="nav-item">
                 <a class="nav-link active" data-toggle="tab" href="#tab-endpoint" role="tab"
-                   @click="changeType('endpoint')">终端</a>
+                   @click="changeType('endpoint')">节点信息</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#tab-application" role="tab"
-                   @click="changeType('application')">应用</a>
+                   @click="changeType('application')">应用信息</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#tab-ip" role="tab"
-                   @click="changeType('ip')">IP</a>
+                   @click="changeType('ip')">IP会话</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#tab-tcp" role="tab"
-                   @click="changeType('tcp')">TCP</a>
+                   @click="changeType('tcp')">TCP会话</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#tab-udp" role="tab"
-                   @click="changeType('udp')">UDP</a>
+                   @click="changeType('udp')">UDP会话</a>
               </li>
             </ul>
           </div>
@@ -69,10 +69,10 @@
                 <tr>
                   <th>IP</th>
                   <th>节点名称</th>
-                  <th>下载<br/>Bytes</th>
-                  <th>上传<br/>Bytes</th>
-                  <th>下载<br/>packets</th>
-                  <th>上传<br/>packets</th>
+                  <th>下载（Bytes）</th>
+                  <th>上传（Bytes）</th>
+                  <th>下载（packets）</th>
+                  <th>上传（packets）</th>
                 </tr>
                 </thead>
               </table>
@@ -147,9 +147,13 @@
                 <button role='button' type="button" class="btn btn-secondary"
                         v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">Flow
 
+
+
                 </button>
                 <button role='button' type="button" class="btn btn-secondary"
                         v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">Packet
+
+
 
                 </button>
               </div>
@@ -175,7 +179,7 @@
               </div>
             </div>
             <div class="d-flex flex-row">
-              <div id="pie-container" style="width: 100%"></div>
+              <div id="pie-container" style="width: 100%; height:640px;"></div>
             </div>
           </div>
         </div>
@@ -303,11 +307,11 @@
 
   };
   const language = {
-    'endpoint': '终端',
-    'application': '应用',
-    'ip': 'IP',
-    'udp': 'UDP',
-    'tcp': 'TCP',
+    'endpoint': '节点信息',
+    'application': '应用信息',
+    'ip': 'IP会话',
+    'udp': 'UDP会话',
+    'tcp': 'TCP会话',
     'packet': '包数',
     'flow': '流量',
     'total': '总',
@@ -501,7 +505,6 @@
           self.table.destroy();
         let loc_url = self.getURL(type);
         let element = element = $('#table_' + type);
-        ;
 
         self.table = element.DataTable({
           "processing": true,
@@ -541,7 +544,7 @@
           },
           "columns": columns_type[type],
         });
-        $("#table_" + self.data_type + "_wrapper").addClass('flex-column');
+        $("#table_" + self.data_type + "_wrapper").addClass('flex-column').removeClass('form-inline');
         $("#table_local_filter input[type=search]").css({width: "auto"});//右上角的默认搜索文本框，不写这个就超出去了。
         $("div.col-xs-12").addClass('col-12');
       },
@@ -677,7 +680,7 @@
               case 'ip':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node + '\n' + data.ip_type,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node + '<br/>' + data.ip_type,
                     'download': data.rx,
                     'upload': data.tx,
                     'total': data.rx + data.tx,
@@ -687,7 +690,7 @@
               case 'tcp':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node,
                     'download': data.rx,
                     'upload': data.tx,
                     'total': data.rx + data.tx,
@@ -697,7 +700,7 @@
               case 'udp':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node,
                     'download': data.rx,
                     'upload': data.tx,
                     'total': data.rx + data.tx,
@@ -729,7 +732,7 @@
               case 'ip':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node + '\n' + data.ip_type,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node + '<br/>' + data.ip_type,
                     'download': data.rx_packets,
                     'upload': data.tx_packets,
                     'total': data.rx_packets + data.tx_packets
@@ -739,7 +742,7 @@
               case 'tcp':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node,
                     'download': data.rx_packets,
                     'upload': data.tx_packets,
                     'total': data.rx_packets + data.tx_packets
@@ -749,7 +752,7 @@
               case 'udp':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node,
                     'download': data.rx_packets,
                     'upload': data.tx_packets,
                     'total': data.rx_packets + data.tx_packets
@@ -794,12 +797,20 @@
             return [data.name, data['total']];
           });
         }
-        self.data_pie = loc_data;
+        self.data_pie = loc_data.sort((a, b) => {
+          return (a[1] > b[1]) ? -1 : ((a[1] < b[1]) ? 1 : 0);
+        });
       },
       setPieData: function () {
         const self = this;
         self.pie.setTitle({text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比'})
-        self.pie.series[0].setData(self.data_pie);
+        let loc = self.data_pie.slice(0, 5);
+        let val_other = 0;
+        self.data_pie.slice(5).forEach(item => {
+          val_other += item[1];
+        });
+        loc.push(['其它', val_other]);
+        self.pie.series[0].setData(loc);
       },
       //reload不改变当前状态，只重新处理新的数据并更新图表
       reloadPie: function () {
@@ -823,7 +834,7 @@
             text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比'
           },
           tooltip: {
-            headerFormat: '{series.name}<br>',
+            headerFormat: '{series.name}<br/>',
             pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
           },
           plotOptions: {
@@ -839,10 +850,16 @@
             }
           },
           legend: {
+            //在下方水平展示
+//            maxHeight: 200,
+//            align: 'left',
+//            verticalAlign: 'bottom',
+
+            //在右方垂直展示
             align: 'right',
             verticalAlign: 'top',
             x: 0,
-            y: 20,
+            y: 100,
             layout: 'vertical',
           },
           series: [{

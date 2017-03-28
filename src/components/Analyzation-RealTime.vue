@@ -217,6 +217,7 @@
                 self.timer = setInterval(function () {
                   let loc_data = self.getData().then(res => {
                     let data_init = self.data2point(res);
+                    console.log(res);
                     //由于每次获取5s的值，添加时每秒添加一次
                     for(let i=0;i<5;i++){
                       setTimeout(function () {
