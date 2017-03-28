@@ -10,11 +10,11 @@
               </a>
             </div>
           </li>
-          <li>
-            <a class="btn btn-icon-toggle" role="button">
-              <i class="fa fa-bars"></i>
-            </a>
-          </li>
+          <!--<li>-->
+            <!--<a class="btn btn-icon-toggle" role="button">-->
+              <!--<i class="fa fa-bars"></i>-->
+            <!--</a>-->
+          <!--</li>-->
         </ul>
       </div>
       <div class="headerbar-right">
