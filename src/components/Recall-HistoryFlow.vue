@@ -146,15 +146,9 @@
               <div class="btn-group" role="group">
                 <button role='button' type="button" class="btn btn-secondary"
                         v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">Flow
-
-
-
                 </button>
                 <button role='button' type="button" class="btn btn-secondary"
                         v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">Packet
-
-
-
                 </button>
               </div>
               <div class="d-flex flex-row" v-if="hasPartition">
@@ -194,8 +188,6 @@
   import dt from 'datatables.net';
   import bs4 from 'datatables.net-bs4';
   import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
-
-  import{history_data} from '../../static/data';
 
   function formatIP(ip) {
     let ret = '' + ip & 255;
@@ -319,13 +311,13 @@
     'upload': '上传',
   };
   //用于可下钻的饼图
-  const choice_type = {
-    'endpoint': true,
-    'application': false,
-    'ip': true,
-    'tcp': true,
-    'udp': true,
-  };
+  //  const choice_type = {
+  //    'endpoint': true,
+  //    'application': false,
+  //    'ip': true,
+  //    'tcp': true,
+  //    'udp': true,
+  //  };
   export default {
     name: 'history-flow',
     data: function () {
@@ -345,13 +337,12 @@
         pie_choice: null,
         data_filtered: [],
         data_pie: [],
-        data_history: history_data,
+        data_history: [],
       };
     },
     methods: {
       init: function () {
         const self = this;
-        self.createMaster();
         //0.自定义DataTable
         self.customDataTable();
         //1. 初始化起止时间：最近一天
@@ -359,7 +350,10 @@
         self.end_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate();
         date.setDate(date.getDate() - 1);
         self.start_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate();
-        //2. 初始化数据
+        //2.创建图表Master，并设置数据
+        self.createMaster();
+        self.reloadMaster();
+        //3. 初始化数据
         self.data_type = 'endpoint';
         self.pie_choice = 'flow';
         self.partition_type = 'total';
@@ -417,6 +411,12 @@
       formatMon(mon){
         return '' + Math.floor(mon / 10) + mon % 10;
       },
+      toKbps(Bps){
+        return Bps * 8 / 1024;
+      },
+      toMbps(Bps){
+        return Bps * 8 / 1024 / 1024;
+      },
       getURL: function (type) {
         const self = this;
         let loc_url = '';
@@ -470,14 +470,69 @@
       //            console.error(err);
       //          });
       //      },
+      getMasterData: function () {
+        const self = this;
+        const suffix = 'T00:00:00';
+        const resource = self.$resource(process.env.DATA_HISTORY);
+        return resource.get({start_time: self.start_time + suffix, end_time: self.end_time + suffix})
+          .then(res => {
+//            console.log(res.data);
+            return res.data;
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      reloadMaster(){
+        const self = this;
+        let diff = new Date(self.end_time) - new Date(self.start_time);
+        let tag_m = true;
+        if (diff <= 24 * 60 * 60 * 1000)
+          tag_m = false;
+        self.getMasterData().then(res => {
+          let loc_data = {
+            'flow': [],
+            'packets': [],
+          };
+          res.forEach(item => {
+            let time = new Date(item.ticker).getTime();
+            loc_data['flow'].push([time, tag_m ? self.toMbps(item.bytes) : self.toKbps(item.bytes)]);
+            loc_data['packets'].push([time, tag_m ? (item.packets / 1000) : (item.packets)]);
+          });
+          self.data_history = loc_data;
+          self.master.series[0].setData(self.data_history['flow']);
+          self.master.series[1].setData(self.data_history['packets']);
+          if (!tag_m) {
+            self.master.update({
+              yAxis: [{
+                labels: {
+                  format: '{value}Kbps',
+                },
+              }, {
+                labels: {
+                  format: '{value}/s',
+                },
+              }],
+              series: [{
+                tootip: {
+                  valueSuffix: 'Kbpss'
+                }
+              }, {
+                tootip: {
+                  valueSuffix: '/s'
+                }
+              }],
+            });
+          }
+        });
 
+      },
       //更改显示的数据的时间
       changeTime: function () {
         const self = this;
         //由于v-model将数据与dom元素绑定，不需传入参数或手动赋值
-        console.log(self.start_time);
-        self.reloadTable();
-//        self.reloadPie();//由于ajax的异步问题，reload资料datatable的ajax属性中调用
+        self.reloadMaster();
+        self.reloadTable();//由于ajax的异步问题，pie的reload在datatable的ajax属性中调用
       },
       //更改显示的数据内容
       changeType: function (type) {
@@ -577,6 +632,7 @@
             }
           },
           tooltip: {
+            shared: true,
             dateTimeLabelFormats: {
               millisecond: '%H:%M:%S.%L',
               second: '%H:%M:%S',
@@ -587,53 +643,88 @@
               month: '%Y-%m',
               year: '%Y'
             },
-            formatter: function () {
-              let point = this.point;
-              return '<b>' + point.series.name + '</b><br/>' +
-                Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
-                Highcharts.numberFormat(point.y, 2) + 'Mbps';
-            }
+//            formatter: function () {
+//              let point = this.point;
+//              console.log(point);
+//              return '<b>' + point.series.name + '</b><br/>' +
+//                Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
+//                Highcharts.numberFormat(point.y, 2) + 'Mbps';
+//            }
           },
-          yAxis: {
+          yAxis: [{
+            labels: {
+              format: '{value}Mbps',
+              style: {
+                color: Highcharts.getOptions().colors[0]
+              }
+            },
             title: {
-              text: 'Mbps'
+              text: '流速',
+              style: {
+                color: Highcharts.getOptions().colors[0]
+              }
             }
-          },
+          }, {
+            labels: {
+              format: '{value}K/s',
+              style: {
+                color: Highcharts.getOptions().colors[1]
+              },
+            },
+            title: {
+              text: '包数',
+              style: {
+                color: Highcharts.getOptions().colors[1]
+              }
+            },
+            opposite: true,
+          }],
           legend: {
             enabled: false
           },
           plotOptions: {
             area: {
-              fillColor: {
-                linearGradient: {
-                  x1: 0,
-                  y1: 0,
-                  x2: 0,
-                  y2: 1
-                },
-                stops: [
-                  [0, Highcharts.getOptions().colors[0]],
-                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                ]
-              },
-              marker: {
-                radius: 2
-              },
-              lineWidth: 1,
-              states: {
-                hover: {
-                  lineWidth: 1
-                }
-              },
-              threshold: null
+//              fillColor: {
+//                linearGradient: {
+//                  x1: 0,
+//                  y1: 0,
+//                  x2: 0,
+//                  y2: 1
+//                },
+//                stops: [
+//                  [0, Highcharts.getOptions().colors[0]],
+//                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+//                ]
+//              },
+//              marker: {
+//                radius: 2
+//              },
+//              lineWidth: 1,
+//              states: {
+//                hover: {
+//                  lineWidth: 1
+//                }
+//              },
+//              threshold: null
             }
           },
           series: [{
             type: 'area',
             name: '流速',
-            pointInterval: 24 * 3600 * 1000,
-            pointStart: Date.UTC(2014, 2, 18),
-            data: self.data_history
+//            pointInterval: 24 * 3600 * 1000,
+//            pointStart: Date.UTC(2014, 2, 18),
+            data: [],
+            tootip: {
+              valueSuffix: 'Mbpss'
+            }
+          }, {
+            type: 'area',
+            name: '包数',
+            yAxis: 1,
+            data: [],
+            tootip: {
+              valueSuffix: 'K/s'
+            }
           }],
         });
       },
@@ -812,15 +903,6 @@
         loc.push(['其它', val_other]);
         self.pie.series[0].setData(loc);
       },
-      //reload不改变当前状态，只重新处理新的数据并更新图表
-      reloadPie: function () {
-        const self = this;
-        let loc_choice = self.pie_choice;
-        let loc_partition = self.partition_type;
-        self.setChoice(loc_choice);
-        self.setPartition(loc_partition);
-        self.setPieData();
-      },
       createSimplePie(){
         const self = this;
         self.pie = new Highcharts.chart('pie-container', {
@@ -869,6 +951,7 @@
           }]
         });
       },
+      //todo:下载
       downloadHistory: function () {
         const self = this;
 //        let id_resource = self.$resource(process.env.ID_PCAP);
