@@ -9,7 +9,7 @@ module.exports = {
   ID_PCAP: '"http://10.5.0.224:8000/rest/pcap/?start_time={start_time}&end_time={end_time}"',
   INFO_PCAP: '"http://10.5.0.224:8000/rest/pcap_state/?task_id={task_id}"',
   FILE_PCAP: '"http://10.5.0.224:8000/rest/download_pcap/"',
-  INFO_PREDICT: '"http://10.5.0.224:8000/rest/predict/{timezone}/"',
+  INFO_PREDICT: '"http://10.5.0.224:8000/rest/predict/"',
   DATA_PREDICT: '"http://10.5.0.224:8000/rest/get_prediction/?task_id={task_id}"',
   // PORT: 9000
 }

@@ -616,6 +616,8 @@
                 self.start_time = loc_start;
                 self.end_time = loc_end;
                 self.changeTime();
+
+                return false;
               }
             },
           },

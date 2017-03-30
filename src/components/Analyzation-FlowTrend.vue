@@ -3,14 +3,14 @@
     <div class="card d-flex flex-column">
       <div class="d-flex flex-row">
         <div class="mb-2 btn-group card-body" data-toggle="buttons">
-          <label role='button' class="btn btn-secondary active" @click="predictDay">
-            <input type="radio" name="options" id="option1" checked> 7天
+          <label role='button' class="btn btn-secondary active" @click="changeInterval('week')">
+            <input type="radio" name="week" id="btn_week" value="week" checked> 7天
           </label>
-          <label role='button' class="btn btn-secondary" @click="predictWeek">
-            <input type="radio" name="options" id="option2"> 31天
+          <label role='button' class="btn btn-secondary" @click="changeInterval('month')">
+            <input type="radio" name="month" id="btn_month" value="month"> 31天
           </label>
-          <label role='button' class="btn btn-secondary" @click="predictMon">
-            <input type="radio" name="options" id="option3"> 365天
+          <label role='button' class="btn btn-secondary" @click="changeInterval('year')">
+            <input type="radio" name="year" id="btn_year" value="year"> 365天
           </label>
         </div>
       </div>
@@ -24,33 +24,100 @@
 <script>
   import Highcharts from 'highcharts';
   require('highcharts/highcharts-more')(Highcharts);
-  import { ranges, averages,averages_week, ranges_week, averages_hour, ranges_hour} from '../../static/data';
 
   export default {
     name: 'real-time',
     data: function () {
       return {
-        range_data: ranges,
-        average_data: averages,
+        data_chart: null,
+        interval: null,
+        range_data: null,
+        average_data: null,
         chart: null,
       };
     },
     methods: {
-      predictDay: function () {
-        console.log("1111111");
-        this.chart.series[0].setData(averages_hour);
-        this.chart.series[1].setData(ranges_hour);
-        this.chart.xAxis[0].update({
-          tickInterval: 60 * 60 * 1000,
-          dateTimeLabelFormats: {
-            hour: '%H:%M',
+      toKB(Bytes){
+        return Bytes / 1024;
+      },
+      changeInterval(interval){
+        const self = this;
+        self.interval = interval;
+        const loc_interval = self.interval;
+        const resource = self.$resource(process.env.DATA_PREDICT);
+        console.log(loc_interval);
+        self.getTaskId().then(response => {
+          let finished = false;
+          console.log(response.task_id);
+          let time;
+          switch (loc_interval) {
+            case 'week':
+              time = 2000;
+              break;
+            case 'month':
+              time = 3000;
+              break;
+            case 'year':
+              time = 5000;
+              break;
           }
+          ;
+          let loc_timer = setInterval(() => {
+            console.log(!finished);
+            console.log(process.env.DATA_PREDICT);
+            if (!finished) {
+              resource.get({task_id: response.task_id})
+                .then(res => {
+                  console.log(res.data);
+                  if (res.data.state === 'SUCCESS') {
+                    finished = true;
+                    console.log(res.data.result.result);
+                    let loc_data = [[], []];
+                    res.data.result.result.forEach(item => {
+                      let loc_time = new Date(item.ds).getTime();
+                      loc_data[0].push([loc_time, self.toKB(item.yhat)]);
+                      loc_data[1].push([loc_time, self.toKB(item.yhat_lower), self.toKB(item.yhat_upper)]);
+                    });
+                    console.log(loc_data);
+                    switch (loc_interval) {
+                      case 'week':
+                        self.predictWeek(loc_data);
+                        break;
+                      case 'month':
+                        self.predictMon(loc_data);
+                        break;
+                      case 'year':
+                        self.predictYear(loc_data);
+                        break;
+                    }
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                })
+            } else {
+              clearInterval(loc_timer);
+            }
+          }, time);
         });
       },
-      predictWeek: function () {
-        console.log("2222222");
-        this.chart.series[0].setData(averages_week);
-        this.chart.series[1].setData(ranges_week);
+      getTaskId: function () {
+        const self = this;
+        const resource = self.$resource(process.env.INFO_PREDICT + self.interval + '/');
+        console.log('Predict Info: ', process.env.INFO_PREDICT + self.interval + '/')
+        return resource.get()
+          .then(res => {
+            console.log(res.data);
+            return res.data;
+          })
+          .catch(err => {
+            console.error(err);
+          });
+      },
+      predictWeek: function (data) {
+        console.log("1111111");
+        this.chart.series[0].setData(data[0]);
+        this.chart.series[1].setData(data[1]);
         this.chart.xAxis[0].update({
           tickInterval: 24 * 60 * 60 * 1000,
           dateTimeLabelFormats: {
@@ -58,67 +125,87 @@
           }
         });
       },
-      predictMon: function () {
-        console.log("333333");
-        this.chart.series[0].setData(averages);
-        this.chart.series[1].setData(ranges);
+      predictMon: function (data) {
+        console.log("2222222");
+        this.chart.series[0].setData(data[0]);
+        this.chart.series[1].setData(data[1]);
         this.chart.xAxis[0].update({
           tickInterval: 7 * 24 * 60 * 60 * 1000,
+          dateTimeLabelFormats: {
+            day: '%Y-%m-%d'
+          }
+        });
+      },
+      predictYear: function (data) {
+        console.log("333333");
+        this.chart.series[0].setData(data[0]);
+        this.chart.series[1].setData(data[1]);
+        this.chart.xAxis[0].update({
+          tickInterval: 30 * 7 * 24 * 60 * 60 * 1000,
           dateTimeLabelFormats: {
             week: '%Y-%m-%d'
           }
         });
-      }
+      },
+      creatChart: function () {
+        const self = this;
+        self.chart = new Highcharts.chart('container', {
+          title: {
+            text: '流速趋势图'
+          },
+          xAxis: {
+            type: 'datetime',
+            tickInterval: 60 * 60 * 1000,
+            dateTimeLabelFormats: {
+              hour: '%H:%M',
+            }
+          },
+          yAxis: {
+            title: {
+              text: null
+            }
+          },
+          tooltip: {
+            crosshairs: true,
+            shared: true,
+            dateTimeLabelFormats: {
+              day: '%Y-%m-%d'
+            },
+          },
+          legend: {},
+          series: [{
+            name: '流量',
+            data: [],
+            zIndex: 1,
+            marker: {
+              fillColor: 'white',
+              lineWidth: 2,
+              lineColor: Highcharts.getOptions().colors[0]
+            },
+            tooltip: {
+              valueDecimals: 2,
+            }
+          }, {
+            name: '范围',
+            data: [],
+            type: 'arearange',
+            lineWidth: 0,
+            linkedTo: ':previous',
+            color: Highcharts.getOptions().colors[0],
+            fillOpacity: 0.3,
+            zIndex: 0,
+            tooltip: {
+              valueDecimals: 2,
+            }
+          }]
+        });
+      },
     },
+
     mounted: function () {
       const self = this;
-      self.chart = new Highcharts.chart('container', {
-        title: {
-          text: '流速趋势图'
-        },
-        xAxis: {
-          type: 'datetime',
-          tickInterval: 60 * 60 * 1000,
-          dateTimeLabelFormats: {
-            hour: '%H:%M',
-          }
-        },
-        yAxis: {
-          title: {
-            text: null
-          }
-        },
-        tooltip: {
-          crosshairs: true,
-          shared: true,
-          valueSuffix: ' Mbps',
-          dateTimeLabelFormats: {
-            day: '%Y-%m-%d'
-          }
-        },
-        legend: {},
-        series: [{
-          name: '流速',
-//          data: self.average_data,
-          data: averages_hour,
-          zIndex: 1,
-          marker: {
-            fillColor: 'white',
-            lineWidth: 2,
-            lineColor: Highcharts.getOptions().colors[0]
-          }
-        }, {
-          name: '范围',
-          data: ranges_hour,
-//          data: self.range_data,
-          type: 'arearange',
-          lineWidth: 0,
-          linkedTo: ':previous',
-          color: Highcharts.getOptions().colors[0],
-          fillOpacity: 0.3,
-          zIndex: 0
-        }]
-      });
+      self.creatChart();
+      self.changeInterval('week');
     }
   };
 </script>
