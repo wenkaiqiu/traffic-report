@@ -13,8 +13,10 @@
 <style rel="stylesheet/sass" lang="sass" scoped>
   #basic-management
     height: 100%
+    background-color: #f8f8f8
     iframe
       border-width: 0
+      margin-top: -60px
       height: 100%
 
 </style>

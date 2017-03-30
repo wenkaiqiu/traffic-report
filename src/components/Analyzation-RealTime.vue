@@ -276,16 +276,25 @@
             name: '总流速',
             data: self.series1,
             color: '#2196f3',
+            marker: {
+              enabled: false
+            }
           },
             {
               name: 'TCP流速',
               data: self.series2,
               color: 'red',
+              marker: {
+                enabled: false
+              }
             },
             {
               name: 'UDP流速',
               data: self.series3,
               color: '#4caf50',
+              marker: {
+                enabled: false
+              }
             }
           ]
         }, function (c) {

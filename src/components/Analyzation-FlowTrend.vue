@@ -4,13 +4,13 @@
       <div class="d-flex flex-row">
         <div class="mb-2 btn-group card-body" data-toggle="buttons">
           <label role='button' class="btn btn-secondary active" @click="predictDay">
-            <input type="radio" name="options" id="option1" checked> 1 Day
+            <input type="radio" name="options" id="option1" checked> 7天
           </label>
           <label role='button' class="btn btn-secondary" @click="predictWeek">
-            <input type="radio" name="options" id="option2"> 1 Week
+            <input type="radio" name="options" id="option2"> 31天
           </label>
           <label role='button' class="btn btn-secondary" @click="predictMon">
-            <input type="radio" name="options" id="option3"> 1 Month
+            <input type="radio" name="options" id="option3"> 365天
           </label>
         </div>
       </div>

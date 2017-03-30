@@ -69,10 +69,10 @@
                 <tr>
                   <th>IP</th>
                   <th>节点名称</th>
-                  <th>下载（Bytes）</th>
-                  <th>上传（Bytes）</th>
-                  <th>下载（packets）</th>
-                  <th>上传（packets）</th>
+                  <th>下载流量</th>
+                  <th>上传流量</th>
+                  <th>下载包数</th>
+                  <th>上传包数</th>
                 </tr>
                 </thead>
               </table>
@@ -82,8 +82,8 @@
                 <thead class="thead-default">
                 <tr>
                   <th>应用名</th>
-                  <th>流量（Bytes）</th>
-                  <th>包数（packets）</th>
+                  <th>流量</th>
+                  <th>包数</th>
                 </tr>
                 </thead>
               </table>
@@ -96,10 +96,10 @@
                   <th>源<br/>节点</th>
                   <th>目的IP</th>
                   <th>目的<br/>节点</th>
-                  <th>下载<br/>Bytes</th>
-                  <th>上传<br/>Bytes</th>
-                  <th>下载<br/>packets</th>
-                  <th>上传<br/>packets</th>
+                  <th>下载<br/>流量</th>
+                  <th>上传<br/>流量</th>
+                  <th>下载<br/>包数</th>
+                  <th>上传<br/>包数</th>
                   <th>协议</th>
                 </tr>
                 </thead>
@@ -113,10 +113,10 @@
                   <th>源<br/>节点</th>
                   <th>目的IP</th>
                   <th>目的<br/>节点</th>
-                  <th>下载<br/>Bytes</th>
-                  <th>上传<br/>Bytes</th>
-                  <th>下载<br/>packets</th>
-                  <th>上传<br/>packets</th>
+                  <th>下载<br/>流量</th>
+                  <th>上传<br/>流量</th>
+                  <th>下载<br/>包数</th>
+                  <th>上传<br/>包数</th>
                 </tr>
                 </thead>
               </table>
@@ -129,10 +129,10 @@
                   <th>源<br/>节点</th>
                   <th>目的IP</th>
                   <th>目的<br/>节点</th>
-                  <th>下载<br/>Bytes</th>
-                  <th>上传<br/>Bytes</th>
-                  <th>下载<br/>packets</th>
-                  <th>上传<br/>packets</th>
+                  <th>下载<br/>流量</th>
+                  <th>上传<br/>流量</th>
+                  <th>下载<br/>包数</th>
+                  <th>上传<br/>包数</th>
                 </tr>
                 </thead>
               </table>
@@ -145,10 +145,10 @@
             <div class="d-flex flex-row justify-content-around" style="height: 38px">
               <div class="btn-group" role="group">
                 <button role='button' type="button" class="btn btn-secondary"
-                        v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">Flow
+                        v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">流量
                 </button>
                 <button role='button' type="button" class="btn btn-secondary"
-                        v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">Packet
+                        v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">包数
                 </button>
               </div>
               <div class="d-flex flex-row" v-if="hasPartition">
@@ -411,11 +411,11 @@
       formatMon(mon){
         return '' + Math.floor(mon / 10) + mon % 10;
       },
-      toKbps(Bps){
-        return Bps * 8 / 1024;
+      toKB(Bytes){
+        return Bytes / 1024;
       },
-      toMbps(Bps){
-        return Bps * 8 / 1024 / 1024;
+      toMB(Bytes){
+        return Bytes / 1024 / 1024;
       },
       getURL: function (type) {
         const self = this;
@@ -496,7 +496,7 @@
           };
           res.forEach(item => {
             let time = new Date(item.ticker).getTime();
-            loc_data['flow'].push([time, tag_m ? self.toMbps(item.bytes) : self.toKbps(item.bytes)]);
+            loc_data['flow'].push([time, tag_m ? self.toMB(item.bytes) : self.toKB(item.bytes)]);
             loc_data['packets'].push([time, tag_m ? (item.packets / 1000) : (item.packets)]);
           });
           self.data_history = loc_data;
@@ -506,7 +506,7 @@
             self.master.update({
               yAxis: [{
                 labels: {
-                  format: '{value}Kbps',
+                  format: '{value}KB',
                 },
               }, {
                 labels: {
@@ -515,7 +515,7 @@
               }],
               series: [{
                 tootip: {
-                  valueSuffix: 'Kbpss'
+                  valueSuffix: 'KB'
                 }
               }, {
                 tootip: {
@@ -619,7 +619,6 @@
           credits: {enabled: false},
           xAxis: {
             type: 'datetime',
-//            minRange: 24 * 3600000,
             dateTimeLabelFormats: {
               millisecond: '%H:%M:%S.%L',
               second: '%H:%M:%S',
@@ -643,38 +642,31 @@
               month: '%Y-%m',
               year: '%Y'
             },
-//            formatter: function () {
-//              let point = this.point;
-//              console.log(point);
-//              return '<b>' + point.series.name + '</b><br/>' +
-//                Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
-//                Highcharts.numberFormat(point.y, 2) + 'Mbps';
-//            }
           },
           yAxis: [{
             labels: {
-              format: '{value}Mbps',
+              format: '{value}MB',
               style: {
-                color: Highcharts.getOptions().colors[0]
+                color: Highcharts.getOptions().colors[1]
               }
             },
             title: {
-              text: '流速',
+              text: '流量',
               style: {
-                color: Highcharts.getOptions().colors[0]
+                color: Highcharts.getOptions().colors[1]
               }
             }
           }, {
             labels: {
               format: '{value}K/s',
               style: {
-                color: Highcharts.getOptions().colors[1]
+                color: Highcharts.getOptions().colors[0]
               },
             },
             title: {
               text: '包数',
               style: {
-                color: Highcharts.getOptions().colors[1]
+                color: Highcharts.getOptions().colors[0]
               }
             },
             opposite: true,
@@ -684,38 +676,37 @@
           },
           plotOptions: {
             area: {
-//              fillColor: {
-//                linearGradient: {
-//                  x1: 0,
-//                  y1: 0,
-//                  x2: 0,
-//                  y2: 1
-//                },
-//                stops: [
-//                  [0, Highcharts.getOptions().colors[0]],
-//                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-//                ]
-//              },
-//              marker: {
-//                radius: 2
-//              },
-//              lineWidth: 1,
-//              states: {
-//                hover: {
-//                  lineWidth: 1
-//                }
-//              },
-//              threshold: null
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0.5).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
             }
           },
           series: [{
             type: 'area',
-            name: '流速',
+            name: '流量',
 //            pointInterval: 24 * 3600 * 1000,
 //            pointStart: Date.UTC(2014, 2, 18),
             data: [],
             tootip: {
-              valueSuffix: 'Mbpss'
+              valueSuffix: 'MB'
             }
           }, {
             type: 'area',
