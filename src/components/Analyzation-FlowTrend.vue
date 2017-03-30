@@ -4,13 +4,13 @@
       <div class="d-flex flex-row">
         <div class="mb-2 btn-group card-body" data-toggle="buttons">
           <label role='button' class="btn btn-secondary active" @click="predictDay">
-            <input type="radio" name="options" id="option1" checked> 1 Day
+            <input type="radio" name="options" id="option1" checked> 7天
           </label>
           <label role='button' class="btn btn-secondary" @click="predictWeek">
-            <input type="radio" name="options" id="option2"> 1 Week
+            <input type="radio" name="options" id="option2"> 31天
           </label>
           <label role='button' class="btn btn-secondary" @click="predictMon">
-            <input type="radio" name="options" id="option3"> 1 Month
+            <input type="radio" name="options" id="option3"> 365天
           </label>
         </div>
       </div>
@@ -24,7 +24,7 @@
 <script>
   import Highcharts from 'highcharts';
   require('highcharts/highcharts-more')(Highcharts);
-  import { ranges, averages,averages_week, ranges_week} from '../../static/data';
+  import { ranges, averages,averages_week, ranges_week, averages_hour, ranges_hour} from '../../static/data';
 
   export default {
     name: 'real-time',
@@ -38,6 +38,14 @@
     methods: {
       predictDay: function () {
         console.log("1111111");
+        this.chart.series[0].setData(averages_hour);
+        this.chart.series[1].setData(ranges_hour);
+        this.chart.xAxis[0].update({
+          tickInterval: 60 * 60 * 1000,
+          dateTimeLabelFormats: {
+            hour: '%H:%M',
+          }
+        });
       },
       predictWeek: function () {
         console.log("2222222");
@@ -70,9 +78,9 @@
         },
         xAxis: {
           type: 'datetime',
-          tickInterval: 7 * 24 * 60 * 60 * 1000,
+          tickInterval: 60 * 60 * 1000,
           dateTimeLabelFormats: {
-            week: '%Y-%m-%d'
+            hour: '%H:%M',
           }
         },
         yAxis: {
@@ -92,7 +100,7 @@
         series: [{
           name: '流速',
 //          data: self.average_data,
-          data: averages,
+          data: averages_hour,
           zIndex: 1,
           marker: {
             fillColor: 'white',
@@ -101,7 +109,7 @@
           }
         }, {
           name: '范围',
-          data: ranges,
+          data: ranges_hour,
 //          data: self.range_data,
           type: 'arearange',
           lineWidth: 0,

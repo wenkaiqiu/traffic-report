@@ -47,8 +47,8 @@
             </div>
             <div class="card-body height-4">
               <div class="d-flex flex-row justify-content-around">
-                <button role="button" type="button" class="btn btn-danger btn-lg col-3" v-bind:disabled="isPause?true:flase">暂停</button>
-                <button role="button" type="button" class="btn btn-success col-3" v-bind:disabled="!isPause?true:flase">开始</button>
+                <button role="button" type="button" class="btn btn-danger btn-lg col-3" v-bind:disabled="isPause?true:flase" @click="setPause()">暂停</button>
+                <button role="button" type="button" class="btn btn-success col-3" v-bind:disabled="!isPause?true:flase" @click="setStart()">开始</button>
               </div><!-- end .d-flex -->
             </div>
           </div>
@@ -68,7 +68,7 @@
         storage_total: 12,
         current_time: new Date().toLocaleString(),
         bpf: "",
-        running_status: 0,
+        running_status: 1,
         isPause: true,
       };
     },
@@ -93,6 +93,16 @@
         let leave3=leave2%(60*1000);    //计算分钟数后剩余的毫秒数
         let seconds=Math.round(leave3/1000);
         return days+"天 "+hours+"小时 "+minutes+" 分钟"+seconds+" 秒"
+      },
+      setPause(){
+          const self =this;
+          self.isPause = true;
+          self.running_status = 1;
+      },
+      setStart(){
+          const self =this;
+          self.isPause = false;
+          self.running_status = 0;
       },
     },
     mounted: function () {

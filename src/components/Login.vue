@@ -52,6 +52,7 @@
 <style rel="stylesheet/sass" lang="sass" scoped>
   @import "../../static/css/materialadmin"
   #section-account
+    margin-top: 20vh
     position: relative
     padding: 24px
     padding-top: 0

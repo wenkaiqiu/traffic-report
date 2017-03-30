@@ -11,9 +11,9 @@
       <router-link tag="li" to="/dashboard/history-flow">
         <a><div class="gui-icon"><i class="md md-poll"></i></div></a>
       </router-link>
-      <router-link tag="li" to="/dashboard/data-package">
-        <a><div class="gui-icon"><i class="md md-laptop-windows"></i></div></a>
-      </router-link>
+      <!--<router-link tag="li" to="/dashboard/data-package">-->
+        <!--<a><div class="gui-icon"><i class="md md-laptop-windows"></i></div></a>-->
+      <!--</router-link>-->
       <router-link tag="li" to="/dashboard/basic-management">
         <a><div class="gui-icon"><i class="md md-settings"></i></div></a>
       </router-link>

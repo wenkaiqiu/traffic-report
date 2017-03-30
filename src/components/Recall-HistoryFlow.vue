@@ -41,23 +41,23 @@
             <ul class="nav nav-tabs nav-fill" role="tablist">
               <li class="nav-item">
                 <a class="nav-link active" data-toggle="tab" href="#tab-endpoint" role="tab"
-                   @click="changeType('endpoint')">终端</a>
+                   @click="changeType('endpoint')">节点信息</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#tab-application" role="tab"
-                   @click="changeType('application')">应用</a>
+                   @click="changeType('application')">应用信息</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#tab-ip" role="tab"
-                   @click="changeType('ip')">IP</a>
+                   @click="changeType('ip')">IP会话</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#tab-tcp" role="tab"
-                   @click="changeType('tcp')">TCP</a>
+                   @click="changeType('tcp')">TCP会话</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#tab-udp" role="tab"
-                   @click="changeType('udp')">UDP</a>
+                   @click="changeType('udp')">UDP会话</a>
               </li>
             </ul>
           </div>
@@ -69,10 +69,10 @@
                 <tr>
                   <th>IP</th>
                   <th>节点名称</th>
-                  <th>下载<br/>Bytes</th>
-                  <th>上传<br/>Bytes</th>
-                  <th>下载<br/>packets</th>
-                  <th>上传<br/>packets</th>
+                  <th>下载流量</th>
+                  <th>上传流量</th>
+                  <th>下载包数</th>
+                  <th>上传包数</th>
                 </tr>
                 </thead>
               </table>
@@ -82,8 +82,8 @@
                 <thead class="thead-default">
                 <tr>
                   <th>应用名</th>
-                  <th>流量（Bytes）</th>
-                  <th>包数（packets）</th>
+                  <th>流量</th>
+                  <th>包数</th>
                 </tr>
                 </thead>
               </table>
@@ -96,10 +96,10 @@
                   <th>源<br/>节点</th>
                   <th>目的IP</th>
                   <th>目的<br/>节点</th>
-                  <th>下载<br/>Bytes</th>
-                  <th>上传<br/>Bytes</th>
-                  <th>下载<br/>packets</th>
-                  <th>上传<br/>packets</th>
+                  <th>下载<br/>流量</th>
+                  <th>上传<br/>流量</th>
+                  <th>下载<br/>包数</th>
+                  <th>上传<br/>包数</th>
                   <th>协议</th>
                 </tr>
                 </thead>
@@ -113,10 +113,10 @@
                   <th>源<br/>节点</th>
                   <th>目的IP</th>
                   <th>目的<br/>节点</th>
-                  <th>下载<br/>Bytes</th>
-                  <th>上传<br/>Bytes</th>
-                  <th>下载<br/>packets</th>
-                  <th>上传<br/>packets</th>
+                  <th>下载<br/>流量</th>
+                  <th>上传<br/>流量</th>
+                  <th>下载<br/>包数</th>
+                  <th>上传<br/>包数</th>
                 </tr>
                 </thead>
               </table>
@@ -129,10 +129,10 @@
                   <th>源<br/>节点</th>
                   <th>目的IP</th>
                   <th>目的<br/>节点</th>
-                  <th>下载<br/>Bytes</th>
-                  <th>上传<br/>Bytes</th>
-                  <th>下载<br/>packets</th>
-                  <th>上传<br/>packets</th>
+                  <th>下载<br/>流量</th>
+                  <th>上传<br/>流量</th>
+                  <th>下载<br/>包数</th>
+                  <th>上传<br/>包数</th>
                 </tr>
                 </thead>
               </table>
@@ -145,12 +145,10 @@
             <div class="d-flex flex-row justify-content-around" style="height: 38px">
               <div class="btn-group" role="group">
                 <button role='button' type="button" class="btn btn-secondary"
-                        v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">Flow
-
+                        v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">流量
                 </button>
                 <button role='button' type="button" class="btn btn-secondary"
-                        v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">Packet
-
+                        v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">包数
                 </button>
               </div>
               <div class="d-flex flex-row" v-if="hasPartition">
@@ -175,7 +173,7 @@
               </div>
             </div>
             <div class="d-flex flex-row">
-              <div id="pie-container" style="width: 100%"></div>
+              <div id="pie-container" style="width: 100%; height:640px;"></div>
             </div>
           </div>
         </div>
@@ -190,8 +188,6 @@
   import dt from 'datatables.net';
   import bs4 from 'datatables.net-bs4';
   import 'datatables.net-bs4/css/dataTables.bootstrap4.css';
-
-  import{history_data} from '../../static/data';
 
   function formatIP(ip) {
     let ret = '' + ip & 255;
@@ -303,11 +299,11 @@
 
   };
   const language = {
-    'endpoint': '终端',
-    'application': '应用',
-    'ip': 'IP',
-    'udp': 'UDP',
-    'tcp': 'TCP',
+    'endpoint': '节点信息',
+    'application': '应用信息',
+    'ip': 'IP会话',
+    'udp': 'UDP会话',
+    'tcp': 'TCP会话',
     'packet': '包数',
     'flow': '流量',
     'total': '总',
@@ -315,13 +311,13 @@
     'upload': '上传',
   };
   //用于可下钻的饼图
-  const choice_type = {
-    'endpoint': true,
-    'application': false,
-    'ip': true,
-    'tcp': true,
-    'udp': true,
-  };
+  //  const choice_type = {
+  //    'endpoint': true,
+  //    'application': false,
+  //    'ip': true,
+  //    'tcp': true,
+  //    'udp': true,
+  //  };
   export default {
     name: 'history-flow',
     data: function () {
@@ -341,13 +337,12 @@
         pie_choice: null,
         data_filtered: [],
         data_pie: [],
-        data_history: history_data,
+        data_history: [],
       };
     },
     methods: {
       init: function () {
         const self = this;
-        self.createMaster();
         //0.自定义DataTable
         self.customDataTable();
         //1. 初始化起止时间：最近一天
@@ -355,7 +350,10 @@
         self.end_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate();
         date.setDate(date.getDate() - 1);
         self.start_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate();
-        //2. 初始化数据
+        //2.创建图表Master，并设置数据
+        self.createMaster();
+        self.reloadMaster();
+        //3. 初始化数据
         self.data_type = 'endpoint';
         self.pie_choice = 'flow';
         self.partition_type = 'total';
@@ -413,6 +411,12 @@
       formatMon(mon){
         return '' + Math.floor(mon / 10) + mon % 10;
       },
+      toKB(Bytes){
+        return Bytes / 1024;
+      },
+      toMB(Bytes){
+        return Bytes / 1024 / 1024;
+      },
       getURL: function (type) {
         const self = this;
         let loc_url = '';
@@ -466,14 +470,69 @@
       //            console.error(err);
       //          });
       //      },
+      getMasterData: function () {
+        const self = this;
+        const suffix = 'T00:00:00';
+        const resource = self.$resource(process.env.DATA_HISTORY);
+        return resource.get({start_time: self.start_time + suffix, end_time: self.end_time + suffix})
+          .then(res => {
+//            console.log(res.data);
+            return res.data;
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      reloadMaster(){
+        const self = this;
+        let diff = new Date(self.end_time) - new Date(self.start_time);
+        let tag_m = true;
+        if (diff <= 24 * 60 * 60 * 1000)
+          tag_m = false;
+        self.getMasterData().then(res => {
+          let loc_data = {
+            'flow': [],
+            'packets': [],
+          };
+          res.forEach(item => {
+            let time = new Date(item.ticker).getTime();
+            loc_data['flow'].push([time, tag_m ? self.toMB(item.bytes) : self.toKB(item.bytes)]);
+            loc_data['packets'].push([time, tag_m ? (item.packets / 1000) : (item.packets)]);
+          });
+          self.data_history = loc_data;
+          self.master.series[0].setData(self.data_history['flow']);
+          self.master.series[1].setData(self.data_history['packets']);
+          if (!tag_m) {
+            self.master.update({
+              yAxis: [{
+                labels: {
+                  format: '{value}KB',
+                },
+              }, {
+                labels: {
+                  format: '{value}/s',
+                },
+              }],
+              series: [{
+                tootip: {
+                  valueSuffix: 'KB'
+                }
+              }, {
+                tootip: {
+                  valueSuffix: '/s'
+                }
+              }],
+            });
+          }
+        });
 
+      },
       //更改显示的数据的时间
       changeTime: function () {
         const self = this;
         //由于v-model将数据与dom元素绑定，不需传入参数或手动赋值
-        console.log(self.start_time);
-        self.reloadTable();
-//        self.reloadPie();//由于ajax的异步问题，reload资料datatable的ajax属性中调用
+        self.reloadMaster();
+        self.reloadTable();//由于ajax的异步问题，pie的reload在datatable的ajax属性中调用
       },
       //更改显示的数据内容
       changeType: function (type) {
@@ -501,7 +560,6 @@
           self.table.destroy();
         let loc_url = self.getURL(type);
         let element = element = $('#table_' + type);
-        ;
 
         self.table = element.DataTable({
           "processing": true,
@@ -541,7 +599,7 @@
           },
           "columns": columns_type[type],
         });
-        $("#table_" + self.data_type + "_wrapper").addClass('flex-column');
+        $("#table_" + self.data_type + "_wrapper").addClass('flex-column').removeClass('form-inline');
         $("#table_local_filter input[type=search]").css({width: "auto"});//右上角的默认搜索文本框，不写这个就超出去了。
         $("div.col-xs-12").addClass('col-12');
       },
@@ -561,7 +619,6 @@
           credits: {enabled: false},
           xAxis: {
             type: 'datetime',
-//            minRange: 24 * 3600000,
             dateTimeLabelFormats: {
               millisecond: '%H:%M:%S.%L',
               second: '%H:%M:%S',
@@ -574,6 +631,7 @@
             }
           },
           tooltip: {
+            shared: true,
             dateTimeLabelFormats: {
               millisecond: '%H:%M:%S.%L',
               second: '%H:%M:%S',
@@ -584,18 +642,35 @@
               month: '%Y-%m',
               year: '%Y'
             },
-            formatter: function () {
-              let point = this.point;
-              return '<b>' + point.series.name + '</b><br/>' +
-                Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>' +
-                Highcharts.numberFormat(point.y, 2) + 'Mbps';
-            }
           },
-          yAxis: {
+          yAxis: [{
+            labels: {
+              format: '{value}MB',
+              style: {
+                color: Highcharts.getOptions().colors[1]
+              }
+            },
             title: {
-              text: 'Mbps'
+              text: '流量',
+              style: {
+                color: Highcharts.getOptions().colors[1]
+              }
             }
-          },
+          }, {
+            labels: {
+              format: '{value}K/s',
+              style: {
+                color: Highcharts.getOptions().colors[0]
+              },
+            },
+            title: {
+              text: '包数',
+              style: {
+                color: Highcharts.getOptions().colors[0]
+              }
+            },
+            opposite: true,
+          }],
           legend: {
             enabled: false
           },
@@ -610,7 +685,7 @@
                 },
                 stops: [
                   [0, Highcharts.getOptions().colors[0]],
-                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0.5).get('rgba')]
                 ]
               },
               marker: {
@@ -622,15 +697,25 @@
                   lineWidth: 1
                 }
               },
-              threshold: null
             }
           },
           series: [{
             type: 'area',
-            name: '流速',
-            pointInterval: 24 * 3600 * 1000,
-            pointStart: Date.UTC(2014, 2, 18),
-            data: self.data_history
+            name: '流量',
+//            pointInterval: 24 * 3600 * 1000,
+//            pointStart: Date.UTC(2014, 2, 18),
+            data: [],
+            tootip: {
+              valueSuffix: 'MB'
+            }
+          }, {
+            type: 'area',
+            name: '包数',
+            yAxis: 1,
+            data: [],
+            tootip: {
+              valueSuffix: 'K/s'
+            }
           }],
         });
       },
@@ -677,7 +762,7 @@
               case 'ip':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node + '\n' + data.ip_type,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node + '<br/>' + data.ip_type,
                     'download': data.rx,
                     'upload': data.tx,
                     'total': data.rx + data.tx,
@@ -687,7 +772,7 @@
               case 'tcp':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node,
                     'download': data.rx,
                     'upload': data.tx,
                     'total': data.rx + data.tx,
@@ -697,7 +782,7 @@
               case 'udp':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node,
                     'download': data.rx,
                     'upload': data.tx,
                     'total': data.rx + data.tx,
@@ -729,7 +814,7 @@
               case 'ip':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node + '\n' + data.ip_type,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node + '<br/>' + data.ip_type,
                     'download': data.rx_packets,
                     'upload': data.tx_packets,
                     'total': data.rx_packets + data.tx_packets
@@ -739,7 +824,7 @@
               case 'tcp':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node,
                     'download': data.rx_packets,
                     'upload': data.tx_packets,
                     'total': data.rx_packets + data.tx_packets
@@ -749,7 +834,7 @@
               case 'udp':
                 loc_data = self.data_table.map(data => {
                   return {
-                    'name': 'from ' + data.left + '/' + data.left_node + '\nto ' + data.right + '/' + data.right_node,
+                    'name': 'from ' + data.left + '/' + data.left_node + '<br/>to ' + data.right + '/' + data.right_node,
                     'download': data.rx_packets,
                     'upload': data.tx_packets,
                     'total': data.rx_packets + data.tx_packets
@@ -794,21 +879,20 @@
             return [data.name, data['total']];
           });
         }
-        self.data_pie = loc_data;
+        self.data_pie = loc_data.sort((a, b) => {
+          return (a[1] > b[1]) ? -1 : ((a[1] < b[1]) ? 1 : 0);
+        });
       },
       setPieData: function () {
         const self = this;
         self.pie.setTitle({text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比'})
-        self.pie.series[0].setData(self.data_pie);
-      },
-      //reload不改变当前状态，只重新处理新的数据并更新图表
-      reloadPie: function () {
-        const self = this;
-        let loc_choice = self.pie_choice;
-        let loc_partition = self.partition_type;
-        self.setChoice(loc_choice);
-        self.setPartition(loc_partition);
-        self.setPieData();
+        let loc = self.data_pie.slice(0, 5);
+        let val_other = 0;
+        self.data_pie.slice(5).forEach(item => {
+          val_other += item[1];
+        });
+        loc.push(['其它', val_other]);
+        self.pie.series[0].setData(loc);
       },
       createSimplePie(){
         const self = this;
@@ -823,7 +907,7 @@
             text: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice] + '比'
           },
           tooltip: {
-            headerFormat: '{series.name}<br>',
+            headerFormat: '{series.name}<br/>',
             pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
           },
           plotOptions: {
@@ -839,10 +923,16 @@
             }
           },
           legend: {
+            //在下方水平展示
+//            maxHeight: 200,
+//            align: 'left',
+//            verticalAlign: 'bottom',
+
+            //在右方垂直展示
             align: 'right',
             verticalAlign: 'top',
             x: 0,
-            y: 20,
+            y: 100,
             layout: 'vertical',
           },
           series: [{
@@ -852,6 +942,7 @@
           }]
         });
       },
+      //todo:下载
       downloadHistory: function () {
         const self = this;
 //        let id_resource = self.$resource(process.env.ID_PCAP);
