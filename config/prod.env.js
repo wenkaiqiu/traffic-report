@@ -7,7 +7,7 @@ module.exports = {
   DATA_APPLICATION: '"http://10.5.0.224:8000/rest/range_query/application/?start_time={start_time}&end_time={end_time}"',
   DATA_CONVERSATION: '"http://10.5.0.224:8000/rest/range_query/conv/?start_time={start_time}&end_time={end_time}"',
   ID_PCAP: '"http://10.5.0.224:8000/rest/pcap/?start_time={start_time}&end_time={end_time}"',
-  INFO_PCAP: '"http://10.5.0.224:8000/rest_state/pcap/?task_id={task_id}"',
+  INFO_PCAP: '"http://10.5.0.224:8000/rest/pcap_state/?task_id={task_id}"',
   FILE_PCAP: '"http://10.5.0.224:8000/rest/download_pcap/"',
   INFO_PREDICT: '"http://10.5.0.224:8000/rest/predict/{timezone}/"',
   DATA_PREDICT: '"http://10.5.0.224:8000/rest/get_prediction/?task_id={task_id}"',

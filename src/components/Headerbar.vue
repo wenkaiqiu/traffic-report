@@ -6,7 +6,7 @@
           <li class="header-nav-brand">
             <div class="brand-holder">
               <a href="/">
-                <span class="my-text-lg my-text-bold my-text-primary">MATERIAL ADMIN</span>
+                <span class="my-text-lg my-text-bold my-text-primary">流量采集数据并行处理及网络协议分析追溯模块</span>
               </a>
             </div>
           </li>

@@ -3,10 +3,6 @@
     <div class="card">
       <div class="row justify-content-center p-2">
         <h2>历史流量分析</h2>
-        <!--<form method="post" action="http://10.5.0.224:8000/rest/download_pcap/" target="_blank">-->
-        <!--<input type="text" name="file_path" value="/tmp/tmp8g4gr_fu.pcap"/>-->
-        <!--<input type="submit" value="Submit"/>-->
-        <!--</form>-->
       </div>
       <div class="row">
         <div class="col-md-12 ">
@@ -20,10 +16,10 @@
             <!--</div>-->
             <div class="form-inline">
               <label for="time-start" class="mr-sm-2">开始时间</label>
-              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" v-model="start_time"
+              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="datetime-local" v-model="start_time"
                      id="time-start">
               <label for="time-end" class="mr-sm-2">结束时间</label>
-              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" v-model="end_time"
+              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="datetime-local" v-model="end_time"
                      id="time-end">
               <button role="button" type="button" class="btn btn-primary mr-sm-2" v-on:click="changeTime()">更新</button>
               <button role="button" type="button" class="btn btn-secondary" @click="downloadHistory()">下载流量记录</button>
@@ -347,9 +343,10 @@
         self.customDataTable();
         //1. 初始化起止时间：最近一天
         let date = new Date();
-        self.end_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate();
+        self.end_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate() + 'T00:00:00';
         date.setDate(date.getDate() - 1);
-        self.start_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate();
+        self.start_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate() + 'T00:00:00';
+        console.log(self.start_time);
         //2.创建图表Master，并设置数据
         self.createMaster();
         self.reloadMaster();
@@ -472,9 +469,8 @@
       //      },
       getMasterData: function () {
         const self = this;
-        const suffix = 'T00:00:00';
         const resource = self.$resource(process.env.DATA_HISTORY);
-        return resource.get({start_time: self.start_time + suffix, end_time: self.end_time + suffix})
+        return resource.get({start_time: self.start_time, end_time: self.end_time})
           .then(res => {
 //            console.log(res.data);
             return res.data;
@@ -500,6 +496,7 @@
             loc_data['packets'].push([time, tag_m ? (item.packets / 1000) : (item.packets)]);
           });
           self.data_history = loc_data;
+//          console.log(self.data_history);
           self.master.series[0].setData(self.data_history['flow']);
           self.master.series[1].setData(self.data_history['packets']);
           if (!tag_m) {
@@ -584,7 +581,6 @@
             "url": '' + loc_url,
             "dataSrc": function (json) {
               let loc_data = json;
-              console.log("---------------");
               if (self.data_type === 'tcp')
                 loc_data = json.filter(item => item.ip_type == 44);
               else if (self.data_type === 'udp')
@@ -593,7 +589,6 @@
 //              console.log(res);
               self.data_table = res;//为饼图提供数据
               self.createPie(self.data_type);
-              console.log("---------------");
               return res;
             },
           },
@@ -611,7 +606,18 @@
         const self = this;
         self.master = new Highcharts.chart('master-container', {
           chart: {
-            zoomType: 'x'
+            zoomType: 'x',
+            type: 'area',
+            events: {
+              selection: function (event) {
+                let loc_start = Highcharts.dateFormat('%Y-%m-%dT%H:%M:%S', event.xAxis[0].min);
+                let loc_end = Highcharts.dateFormat('%Y-%m-%dT%H:%M:%S', event.xAxis[0].max);
+                console.log(loc_start, ' ', loc_end);
+                self.start_time = loc_start;
+                self.end_time = loc_end;
+                self.changeTime();
+              }
+            },
           },
           title: {
             text: '历史流量图'
@@ -676,46 +682,35 @@
           },
           plotOptions: {
             area: {
-              fillColor: {
-                linearGradient: {
-                  x1: 0,
-                  y1: 0,
-                  x2: 0,
-                  y2: 1
-                },
-                stops: [
-                  [0, Highcharts.getOptions().colors[0]],
-                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0.5).get('rgba')]
-                ]
-              },
               marker: {
-                radius: 2
-              },
-              lineWidth: 1,
-              states: {
-                hover: {
-                  lineWidth: 1
+                enabled: false,
+                symbol: 'circle',
+                radius: 2,
+                states: {
+                  hover: {
+                    enabled: true
+                  }
                 }
               },
             }
           },
           series: [{
-            type: 'area',
             name: '流量',
 //            pointInterval: 24 * 3600 * 1000,
 //            pointStart: Date.UTC(2014, 2, 18),
             data: [],
             tootip: {
               valueSuffix: 'MB'
-            }
+            },
+            fillOpacity: 0.4
           }, {
-            type: 'area',
             name: '包数',
             yAxis: 1,
             data: [],
             tootip: {
               valueSuffix: 'K/s'
-            }
+            },
+            fillOpacity: 0.3
           }],
         });
       },
@@ -942,49 +937,58 @@
           }]
         });
       },
-      //todo:下载
       downloadHistory: function () {
         const self = this;
-//        let id_resource = self.$resource(process.env.ID_PCAP);
-//        let url_resource = self.$resource(process.env.INFO_PCAP);
-        let result_resource = self.$resource(process.env.FILE_PCAP);
-//
-//        let task_id = id_resource.get({ start_time: self.start_time, end_time: self.end_time })
-//          .then(res => {
-//            console.log(res);
-//            console.log(res.data);
-//            return res.data;
-//          })
-//          .catch(err => {
-//            console.error(err);
-//          });
-//        task_id.then(res=>{
-//          let finished = false;
-//          let res_url;
-////          for(!finished) {
-////            task_id.then();
-////          }
-//        });
-        //方法1
-        result_resource.save({'file_path': "/tmp/tmp8g4gr_fu.pcap"}).then(res => {
-          console.log(res);
-        });
-        //方法2
-        $("#downloadform").remove();
-        var form = $("<form>");//定义一个form表单
-        form.attr("id", "downloadform");
-        form.attr("style", "display:none");
-        form.attr("target", "_blank");
-        form.attr("method", "post");
-        form.attr("action", "http://10.5.0.224:8000/rest/download_pcap/");
-        var input1 = $("<input>");
-        input1.attr("type", "text");
-        input1.attr("name", "file_path");
-        input1.attr("value", "/tmp/tmp8g4gr_fu.pcap");
-        form.append(input1);
-        $("body").append(form);//将表单放置在web中
+        const id_resource = self.$resource(process.env.ID_PCAP);
+        const url_resource = self.$resource(process.env.INFO_PCAP);
 
-        form.submit();//表单提交
+        let task_id = id_resource.get({start_time: self.start_time, end_time: self.end_time})
+          .then(res => {
+            console.log('get task_id: ');
+            console.log(res.data);
+            return res.data;
+          })
+          .catch(err => {
+            console.error(err);
+          });
+        console.log('---1---');
+        task_id.then(res => {
+          let task_id = res.task_id;
+          let finished = false;
+          let res_url;
+          let loc_timer = setInterval(() => {
+            if (!finished) {
+              res_url = url_resource.get({task_id: task_id})
+                .then(res => {
+                  return res.data;
+                });
+              console.log('---2---');
+              res_url.then(res => {
+                console.log('get file_path: ');
+                if (res.state === 'SUCCESS') {
+                  finished = true;
+                  $("#downloadform").remove();
+                  var form = $("<form>");//定义一个form表单
+                  form.attr("id", "downloadform");
+                  form.attr("style", "display:none");
+                  form.attr("target", "");
+                  form.attr("method", "post");
+                  form.attr("action", process.env.FILE_PCAP);
+                  var input1 = $("<input>");
+                  input1.attr("type", "text");
+                  input1.attr("name", "file_path");
+                  input1.attr("value", res.result);
+                  form.append(input1);
+                  $("body").append(form);//将表单放置在web中
+
+                  form.submit();//表单提交
+                }
+              });
+            } else {
+              clearInterval(loc_timer);
+            }
+          }, 2000);
+        });
       },
     },
     mounted: function () {
