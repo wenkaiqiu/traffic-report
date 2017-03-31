@@ -28,10 +28,51 @@
         </div>
       </div>
       <div class="row">
-        <div id="master-container" class="col-12" style="height:400px"></div>
+        <div id="master-container" class="col-9" style="height:400px"></div>
+        <div class="col-md-3">
+          <div class="d-flex flex-column">
+            <div class="d-flex flex-row">
+              <div id="pie-container" style="width: 100%; height:400px;"></div>
+            </div>
+            <div class="d-flex flex-row justify-content-around" style="height: 38px">
+              <div class="btn-group" role="group">
+                <button role='button' type="button" class="btn btn-sm btn-secondary"
+                        v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">流量
+
+
+                </button>
+                <button role='button' type="button" class="btn btn-sm btn-secondary"
+                        v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">包数
+
+
+                </button>
+              </div>
+              <div class="d-flex flex-row" v-if="hasPartition">
+                <div class="form-check form-check-inline d-flex align-items-center">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="radio_total" id="radio_total"
+                           value="total" v-model="partition_type" @click="changePartition('total')">总
+                  </label>
+                </div>
+                <div class="form-check form-check-inline d-flex align-items-center">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="radio_download" id="radio_download"
+                           value="download" v-model="partition_type" @click="changePartition('download')">接收
+                  </label>
+                </div>
+                <div class="form-check form-check-inline d-flex align-items-center">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="radio_upload" id="radio_upload"
+                           value="upload" v-model="partition_type" @click="changePartition('upload')">发送
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           <div class="card-head">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs nav-fill" role="tablist">
@@ -65,10 +106,10 @@
                 <tr>
                   <th>IP</th>
                   <th>节点名称</th>
-                  <th>下载流量</th>
-                  <th>上传流量</th>
-                  <th>下载包数</th>
-                  <th>上传包数</th>
+                  <th>接收流量</th>
+                  <th>发送流量</th>
+                  <th>接收包数</th>
+                  <th>发送包数</th>
                 </tr>
                 </thead>
               </table>
@@ -89,13 +130,13 @@
                 <thead class="thead-default">
                 <tr>
                   <th>源IP</th>
-                  <th>源<br/>节点</th>
+                  <th>源节点</th>
                   <th>目的IP</th>
-                  <th>目的<br/>节点</th>
-                  <th>下载<br/>流量</th>
-                  <th>上传<br/>流量</th>
-                  <th>下载<br/>包数</th>
-                  <th>上传<br/>包数</th>
+                  <th>目的节点</th>
+                  <th>接收流量</th>
+                  <th>发送流量</th>
+                  <th>接收包数</th>
+                  <th>发送包数</th>
                   <th>协议</th>
                 </tr>
                 </thead>
@@ -106,13 +147,13 @@
                 <thead class="thead-default">
                 <tr>
                   <th>源IP</th>
-                  <th>源<br/>节点</th>
+                  <th>源节点</th>
                   <th>目的IP</th>
-                  <th>目的<br/>节点</th>
-                  <th>下载<br/>流量</th>
-                  <th>上传<br/>流量</th>
-                  <th>下载<br/>包数</th>
-                  <th>上传<br/>包数</th>
+                  <th>目的节点</th>
+                  <th>接收流量</th>
+                  <th>发送流量</th>
+                  <th>接收包数</th>
+                  <th>发送包数</th>
                 </tr>
                 </thead>
               </table>
@@ -122,56 +163,19 @@
                 <thead class="thead-default">
                 <tr>
                   <th>源IP</th>
-                  <th>源<br/>节点</th>
+                  <th>源节点</th>
                   <th>目的IP</th>
-                  <th>目的<br/>节点</th>
-                  <th>下载<br/>流量</th>
-                  <th>上传<br/>流量</th>
-                  <th>下载<br/>包数</th>
-                  <th>上传<br/>包数</th>
+                  <th>目的节点</th>
+                  <th>接收流量</th>
+                  <th>发送流量</th>
+                  <th>接收包数</th>
+                  <th>发送包数</th>
                 </tr>
                 </thead>
               </table>
             </div>
           </div>
 
-        </div>
-        <div class="col-md-4">
-          <div class="d-flex flex-column">
-            <div class="d-flex flex-row justify-content-around" style="height: 38px">
-              <div class="btn-group" role="group">
-                <button role='button' type="button" class="btn btn-secondary"
-                        v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">流量
-                </button>
-                <button role='button' type="button" class="btn btn-secondary"
-                        v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">包数
-                </button>
-              </div>
-              <div class="d-flex flex-row" v-if="hasPartition">
-                <div class="form-check form-check-inline d-flex align-items-center">
-                  <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="radio_total" id="radio_total"
-                           value="total" v-model="partition_type" @click="changePartition('total')">总
-                  </label>
-                </div>
-                <div class="form-check form-check-inline d-flex align-items-center">
-                  <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="radio_download" id="radio_download"
-                           value="download" v-model="partition_type" @click="changePartition('download')">下载
-                  </label>
-                </div>
-                <div class="form-check form-check-inline d-flex align-items-center">
-                  <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="radio_upload" id="radio_upload"
-                           value="upload" v-model="partition_type" @click="changePartition('upload')">上传
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="d-flex flex-row">
-              <div id="pie-container" style="width: 100%; height:640px;"></div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -303,8 +307,8 @@
     'packet': '包数',
     'flow': '流量',
     'total': '总',
-    'download': '下载',
-    'upload': '上传',
+    'download': '接收',
+    'upload': '发送',
   };
   //用于可下钻的饼图
   //  const choice_type = {
@@ -356,6 +360,15 @@
         self.partition_type = 'total';
 //        self.getData(); //使用DataTable后，由DataTable发起ajax请求，故不需要调用该方法
         self.changeType(self.data_type);
+      },
+      checkTime(time){
+        //仅检查时间部分
+        console.log('check time ', time);
+        let date = time.split('T');
+        let loc_time = date[1].split(':');
+        if (loc_time.length != 3)
+          return time + ':00';
+        return time;
       },
       customDataTable(){
         $.fn.dataTableExt.aTypes.push(
@@ -499,6 +512,8 @@
 //          console.log(self.data_history);
           self.master.series[0].setData(self.data_history['flow']);
           self.master.series[1].setData(self.data_history['packets']);
+          self.master.hideLoading();
+          console.log('tag_m', tag_m);
           if (!tag_m) {
             self.master.update({
               yAxis: [{
@@ -511,12 +526,13 @@
                 },
               }],
               series: [{
-                tootip: {
-                  valueSuffix: 'KB'
+                tooltip: {
+                  valueSuffix: 'KB',
+                  valueDecimals: 2,
                 }
               }, {
-                tootip: {
-                  valueSuffix: '/s'
+                tooltip: {
+                  valueSuffix: ''
                 }
               }],
             });
@@ -527,6 +543,10 @@
       //更改显示的数据的时间
       changeTime: function () {
         const self = this;
+        self.pie.showLoading();
+        self.master.showLoading();
+        self.start_time = self.checkTime(self.start_time);
+        self.end_time = self.checkTime(self.end_time);
         //由于v-model将数据与dom元素绑定，不需传入参数或手动赋值
         self.reloadMaster();
         self.reloadTable();//由于ajax的异步问题，pie的reload在datatable的ajax属性中调用
@@ -540,6 +560,7 @@
       changeChoice: function (type) {
         const self = this;
         self.pie_choice = type;
+        self.pie.showLoading();
         self.setChoice(type);
         //切换choice时，将Partition重置为total
         self.setPartition('total');
@@ -547,6 +568,7 @@
       },
       changePartition: function (type) {
         const self = this;
+        self.pie.showLoading();
         self.setPartition(type);
         self.setPieData();
       },
@@ -588,7 +610,7 @@
               let res = loc_data.map(ajax_process[type]);
 //              console.log(res);
               self.data_table = res;//为饼图提供数据
-              self.createPie(self.data_type);
+              self.createPie();
               return res;
             },
           },
@@ -604,15 +626,30 @@
       },
       createMaster: function () {
         const self = this;
+        Highcharts.setOptions({
+          lang: {
+            loading: '数据加载中...'  // 加载中文字配置
+          }
+        });
         self.master = new Highcharts.chart('master-container', {
           chart: {
             zoomType: 'x',
-            type: 'area',
+            type: 'areaspline',
             events: {
               selection: function (event) {
-                let loc_start = Highcharts.dateFormat('%Y-%m-%dT%H:%M:%S', event.xAxis[0].min);
-                let loc_end = Highcharts.dateFormat('%Y-%m-%dT%H:%M:%S', event.xAxis[0].max);
+                let loc_min = event.xAxis[0].min;
+                let loc_max = event.xAxis[0].max;
+                if ((loc_max - loc_min) < 3 * 60 * 1000)
+                  loc_max = loc_min + 3 * 60 * 1000;
+                let current = new Date().getTime();
+                if (loc_max > current) {
+                  loc_max = current;
+                  loc_min = loc_max - 3 * 60 * 1000;
+                }
+                let loc_start = Highcharts.dateFormat('%Y-%m-%dT%H:%M:%S', loc_min);
+                let loc_end = Highcharts.dateFormat('%Y-%m-%dT%H:%M:%S', loc_max);
                 console.log(loc_start, ' ', loc_end);
+
                 self.start_time = loc_start;
                 self.end_time = loc_end;
                 self.changeTime();
@@ -683,7 +720,7 @@
             enabled: false
           },
           plotOptions: {
-            area: {
+            areaspline: {
               marker: {
                 enabled: false,
                 symbol: 'circle',
@@ -694,6 +731,12 @@
                   }
                 }
               },
+              lineWidth: 2,
+              states: {
+                hover: {
+                  lineWidth: 3
+                }
+              },
             }
           },
           series: [{
@@ -701,20 +744,22 @@
 //            pointInterval: 24 * 3600 * 1000,
 //            pointStart: Date.UTC(2014, 2, 18),
             data: [],
-            tootip: {
-              valueSuffix: 'MB'
+            tooltip: {
+              valueSuffix: 'MB',
+              valueDecimals: 2,
             },
             fillOpacity: 0.4
           }, {
             name: '包数',
             yAxis: 1,
             data: [],
-            tootip: {
-              valueSuffix: 'K/s'
+            tooltip: {
+              valueSuffix: 'K'
             },
             fillOpacity: 0.3
           }],
         });
+        self.master.showLoading();
       },
       createPie: function () {
         const self = this;
@@ -729,6 +774,7 @@
 //        } else {
         self.createSimplePie();
 //        }
+        self.pie.showLoading();
         self.setPieData();
       },
       setChoice: function (type) {
@@ -879,6 +925,12 @@
         self.data_pie = loc_data.sort((a, b) => {
           return (a[1] > b[1]) ? -1 : ((a[1] < b[1]) ? 1 : 0);
         });
+        if (self.pie != null)
+          self.pie.update({
+            series: [{
+              name: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice],
+            }]
+          })
       },
       setPieData: function () {
         const self = this;
@@ -890,9 +942,15 @@
         });
         loc.push(['其它', val_other]);
         self.pie.series[0].setData(loc);
+        self.pie.hideLoading();
       },
       createSimplePie(){
         const self = this;
+        Highcharts.setOptions({
+          lang: {
+            loading: '数据加载中...'  // 加载中文字配置
+          }
+        });
         self.pie = new Highcharts.chart('pie-container', {
           chart: {
             plotBackgroundColor: null,
@@ -909,8 +967,8 @@
           },
           plotOptions: {
             pie: {
-              center: [150, 150],
-              size: 300,
+              center: [100, 100],
+              size: 200,
               allowPointSelect: true,
               cursor: 'pointer',
               dataLabels: {
@@ -921,16 +979,18 @@
           },
           legend: {
             //在下方水平展示
-//            maxHeight: 200,
-//            align: 'left',
-//            verticalAlign: 'bottom',
+            x: 0,
+            y: 50,
+            maxHeight: 80,
+            align: 'left',
+            verticalAlign: 'top',
 
             //在右方垂直展示
-            align: 'right',
-            verticalAlign: 'top',
-            x: 0,
-            y: 100,
-            layout: 'vertical',
+//            align: 'right',
+//            verticalAlign: 'top',
+//            x: 0,
+//            y: 100,
+//            layout: 'vertical',
           },
           series: [{
             type: 'pie',
@@ -938,6 +998,7 @@
             data: [],
           }]
         });
+        self.pie.showLoading();
       },
       downloadHistory: function () {
         const self = this;
@@ -1008,6 +1069,9 @@
     height: 100%
     /*&:first-child*/
       /*padding-top: 0*/
+    .table
+      th, td
+        padding: 0.5em
     .card
       position: relative
       margin-bottom: 24px

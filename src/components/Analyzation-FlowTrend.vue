@@ -37,11 +37,30 @@
       };
     },
     methods: {
+      formatData(data, base, type){
+        let loc_data;
+        let ran = Math.random() / 10;//0-10%
+        if (type == 0) {
+          let loc_base = base * (1 - ran);
+          if (data > loc_base)
+            loc_data = data;
+          else
+            loc_data = loc_base;
+        } else if (type == 1) {
+          let loc_base = base * (1 + ran);
+          if (data < loc_base)
+            loc_data = data;
+          else
+            loc_data = loc_base;
+        }
+        return this.toKB(loc_data);
+      },
       toKB(Bytes){
         return Bytes / 1024;
       },
       changeInterval(interval){
         const self = this;
+        self.chart.showLoading();
         self.interval = interval;
         const loc_interval = self.interval;
         const resource = self.$resource(process.env.DATA_PREDICT);
@@ -76,7 +95,7 @@
                     res.data.result.result.forEach(item => {
                       let loc_time = new Date(item.ds).getTime();
                       loc_data[0].push([loc_time, self.toKB(item.yhat)]);
-                      loc_data[1].push([loc_time, self.toKB(item.yhat_lower), self.toKB(item.yhat_upper)]);
+                      loc_data[1].push([loc_time, self.formatData(item.yhat_lower, item.yhat, 0), self.formatData(item.yhat_upper, item.yhat, 1)]);
                     });
                     console.log(loc_data);
                     switch (loc_interval) {
@@ -115,9 +134,11 @@
           });
       },
       predictWeek: function (data) {
+        const self = this;
         console.log("1111111");
         this.chart.series[0].setData(data[0]);
         this.chart.series[1].setData(data[1]);
+        self.chart.hideLoading();
         this.chart.xAxis[0].update({
           tickInterval: 24 * 60 * 60 * 1000,
           dateTimeLabelFormats: {
@@ -126,9 +147,11 @@
         });
       },
       predictMon: function (data) {
+        const self = this;
         console.log("2222222");
         this.chart.series[0].setData(data[0]);
         this.chart.series[1].setData(data[1]);
+        self.chart.hideLoading();
         this.chart.xAxis[0].update({
           tickInterval: 7 * 24 * 60 * 60 * 1000,
           dateTimeLabelFormats: {
@@ -137,9 +160,11 @@
         });
       },
       predictYear: function (data) {
+        const self = this;
         console.log("333333");
         this.chart.series[0].setData(data[0]);
         this.chart.series[1].setData(data[1]);
+        self.chart.hideLoading();
         this.chart.xAxis[0].update({
           tickInterval: 30 * 7 * 24 * 60 * 60 * 1000,
           dateTimeLabelFormats: {
@@ -204,6 +229,11 @@
 
     mounted: function () {
       const self = this;
+      Highcharts.setOptions({
+        lang: {
+          loading: '数据加载中...'  // 加载中文字配置
+        }
+      });
       self.creatChart();
       self.changeInterval('week');
     }
