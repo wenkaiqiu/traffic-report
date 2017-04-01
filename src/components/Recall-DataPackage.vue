@@ -10,7 +10,8 @@
   };
 </script>
 
-<style rel="stylesheet/sass" lang="sass">
+<style rel="stylesheet/sass" lang="sass" scoped>
   #data-package
-
+    overflow: auto
+    height: 100%
 </style>

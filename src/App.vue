@@ -1,23 +1,13 @@
 <template>
   <div id="app">
-    <Headerbar/>
-    <Menubar/>
-    <div class="content">
-      <router-view></router-view>
-    </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-  import Headerbar from './components/Headerbar';
-  import Menubar from './components/Menubar';
 
   export default {
     name: 'app',
-    components: {
-      Headerbar,
-      Menubar,
-    },
   };
 </script>
 
@@ -30,8 +20,5 @@
     background: #e5e6e6
     background-size: 100% 100%
     color: #313534
-    .content
-      position: relative
-      padding-left: 64px
-      padding-top: 64px
+
 </style>

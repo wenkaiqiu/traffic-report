@@ -7,6 +7,7 @@ import BasicManagement from '@/components/Management-Basic';
 import ConfigurationManagement from '@/components/Management-Configuration';
 import DataPackage from '@/components/Recall-DataPackage';
 import HistoryFlow from '@/components/Recall-HistoryFlow';
+import Login from '@/components/Login';
 
 Vue.use(Router);
 
@@ -14,38 +15,50 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'greeting',
+      redirect: { name: 'login' }
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
+    },
+    {
+      path: '/dashboard/',
       component: Greeting,
-    },
-    {
-      path: '/flow-trend',
-      name: 'flow-trend',
-      component: FlowTrend,
-    },
-    {
-      path: '/real-time',
-      name: 'real-time',
-      component: RealTime,
-    },
-    {
-      path: '/basic-management',
-      name: 'basic-management',
-      component: BasicManagement,
-    },
-    {
-      path: '/configuration-management',
-      name: 'configuration-management',
-      component: ConfigurationManagement,
-    },
-    {
-      path: '/data-package',
-      name: 'data-package',
-      component: DataPackage,
-    },
-    {
-      path: '/history-flow',
-      name: 'history-flow',
-      component: HistoryFlow,
-    },
+
+      children: [
+        { path: '', redirect: { name: 'real-time' } },
+        {
+          path: 'flow-trend',
+          name: 'flow-trend',
+          component: FlowTrend,
+        },
+        {
+          path: 'real-time',
+          name: 'real-time',
+          component: RealTime,
+        },
+        {
+          path: 'basic-management',
+          name: 'basic-management',
+          component: BasicManagement,
+        },
+        {
+          path: 'configuration-management',
+          name: 'configuration-management',
+          component: ConfigurationManagement,
+        },
+        {
+          path: 'data-package',
+          name: 'data-package',
+          component: DataPackage,
+        },
+        {
+          path: 'history-flow',
+          name: 'history-flow',
+          component: HistoryFlow,
+        },
+      ],
+    }
   ],
 });

@@ -1,17 +1,31 @@
 <template>
   <div id="greeting">
-    <h1>Welcome</h1>
-    <h2>欢迎使用本系统，请点击左侧的选项查看信息。</h2>
+    <Headerbar/>
+    <Menubar/>
+    <div class="content">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
+  import Headerbar from './Headerbar';
+  import Menubar from './Menubar';
+
   export default {
     name: 'greeting',
+    components: {
+      Headerbar,
+      Menubar,
+    },
   };
 </script>
 
-<style rel="stylesheet/sass" lang="sass">
+<style rel="stylesheet/sass" lang="sass" scoped>
   #greeting
-
+    .content
+      position: relative
+      padding-left: 64px
+      padding-top: 64px
+      height: 100vh
 </style>
