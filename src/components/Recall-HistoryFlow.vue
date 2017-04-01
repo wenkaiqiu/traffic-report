@@ -199,7 +199,7 @@
     'endpoint': [
       {"data": "ip"},
       {"data": "ip_node"},
-      {"data": "rx"},
+      {"data": "rx",},
       {"data": "tx"},
       {"data": "rx_packets"},
       {"data": "tx_packets"},
@@ -347,9 +347,9 @@
         self.customDataTable();
         //1. 初始化起止时间：最近一天
         let date = new Date();
-        self.end_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate() + 'T00:00:00';
+        self.end_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + self.formatMon(date.getDate()) + 'T00:00:00';
         date.setDate(date.getDate() - 1);
-        self.start_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate() + 'T00:00:00';
+        self.start_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + self.formatMon(date.getDate()) + 'T00:00:00';
         console.log(self.start_time);
         //2.创建图表Master，并设置数据
         self.createMaster();
@@ -367,7 +367,7 @@
         let date = time.split('T');
         let loc_time = date[1].split(':');
         if (loc_time.length != 3)
-          return time + ':00';
+          return time + ':01';
         return time;
       },
       customDataTable(){
@@ -432,19 +432,19 @@
         let loc_url = '';
         switch (type) {
           case 'endpoint':
-            loc_url = process.env.DATA_ENDPOINT;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_ENDPOINT;
             break;
           case 'application':
-            loc_url = process.env.DATA_APPLICATION;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_APPLICATION;
             break;
           case 'ip':
-            loc_url = process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
             break;
           case 'tcp':
-            loc_url = process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
             break;
           case 'udp':
-            loc_url = process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
             break;
         }
         //替换loc_url中的占位符{start_time}和{end_time}
@@ -461,13 +461,13 @@
       //
       //        switch (type) {
       //          case 'endpoint':
-      //            resource = self.$resource(process.env.DATA_ENDPOINT);
+      //            resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_ENDPOINT);
       //            break;
       //          case 'application':
-      //            resource = self.$resource(process.env.DATA_APPLICATION);
+      //            resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_APPLICATION);
       //            break;
       //          case 'conv':
-      //            resource = self.$resource(process.env.DATA_CONVERSATION);
+      //            resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION);
       //            break;
       //        }
       //        return resource.get({ start_time: '2017-03-01', end_time: '2017-03-31' })
@@ -482,7 +482,7 @@
       //      },
       getMasterData: function () {
         const self = this;
-        const resource = self.$resource(process.env.DATA_HISTORY);
+        const resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_HISTORY);
         return resource.get({start_time: self.start_time, end_time: self.end_time})
           .then(res => {
 //            console.log(res.data);
@@ -581,6 +581,16 @@
         let element = element = $('#table_' + type);
 
         self.table = element.DataTable({
+//          "columnDefs": [ {
+//            "targets": [2,3],
+//            "createdCell": function (td, cellData, rowData, row, col) {
+//              console.log("---");
+//              if ( cellData < 1 ) {
+//                console.log(cellData);
+//                $(td).css('color', 'red')
+//              }
+//            }
+//          } ],
           "processing": true,
           "lengthChange": false,
           language: {
@@ -1002,8 +1012,8 @@
       },
       downloadHistory: function () {
         const self = this;
-        const id_resource = self.$resource(process.env.ID_PCAP);
-        const url_resource = self.$resource(process.env.INFO_PCAP);
+        const id_resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.ID_PCAP);
+        const url_resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.INFO_PCAP);
 
         let task_id = id_resource.get({start_time: self.start_time, end_time: self.end_time})
           .then(res => {
@@ -1036,7 +1046,7 @@
                   form.attr("style", "display:none");
                   form.attr("target", "");
                   form.attr("method", "post");
-                  form.attr("action", process.env.FILE_PCAP);
+                  form.attr("action", window.location.protocol+'//'+window.location.hostname+process.env.FILE_PCAP);
                   var input1 = $("<input>");
                   input1.attr("type", "text");
                   input1.attr("name", "file_path");

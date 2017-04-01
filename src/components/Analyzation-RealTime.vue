@@ -304,7 +304,7 @@
 
       getData: function () {
         const self = this;
-        const resource = self.$resource(process.env.DATA_REALTIME);
+        const resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_REALTIME);
         return resource.get().then(res => {
           return res.data.sort((a, b) => (b.pk - a.pk));
         }).catch(err => {

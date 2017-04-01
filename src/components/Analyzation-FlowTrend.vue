@@ -63,7 +63,7 @@
         self.chart.showLoading();
         self.interval = interval;
         const loc_interval = self.interval;
-        const resource = self.$resource(process.env.DATA_PREDICT);
+        const resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_PREDICT);
         console.log(loc_interval);
         self.getTaskId().then(response => {
           let finished = false;
@@ -83,7 +83,7 @@
           ;
           let loc_timer = setInterval(() => {
             console.log(!finished);
-            console.log(process.env.DATA_PREDICT);
+            console.log(window.location.protocol+'//'+window.location.hostname+process.env.DATA_PREDICT);
             if (!finished) {
               resource.get({task_id: response.task_id})
                 .then(res => {
@@ -122,8 +122,8 @@
       },
       getTaskId: function () {
         const self = this;
-        const resource = self.$resource(process.env.INFO_PREDICT + self.interval + '/');
-        console.log('Predict Info: ', process.env.INFO_PREDICT + self.interval + '/')
+        const resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.INFO_PREDICT + self.interval + '/');
+        console.log('Predict Info: ', window.location.protocol+'//'+window.location.hostname+process.env.INFO_PREDICT + self.interval + '/')
         return resource.get()
           .then(res => {
             console.log(res.data);
