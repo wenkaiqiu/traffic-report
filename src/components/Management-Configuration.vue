@@ -30,17 +30,19 @@
               </div><!-- end .row -->
               <div class="form-group row">
                 <label for="bpf" class="col-4 col-form-label col-form-label-lg">BPF</label>
-                <div class="col-8">
-                  <input class="form-control" type="text" id="bpf" placeholder="请输入BPF"
+                <div class="col-8 d-flex">
+                  <input class="form-control mr-2" type="text" id="bpf" placeholder="请输入BPF"
                          v-model="bpf">
+                  <button role='button' type="button" class="btn mb-2 btn-primary">更新</button>
                 </div>
+
               </div><!-- end .row -->
               <div class="form-group row">
                 <label for="running-status" class="col-4 col-form-label col-form-label-lg">运行状态</label>
                 <div class="col-8">
                   <p class="form-control-static" id="running-status">
-                    <span v-if="running_status==0">Running</span>
-                    <span v-else-if="running_status==1">Pause</span>
+                    <span v-if="running_status==0">运行</span>
+                    <span v-else-if="running_status==1">暂停</span>
                   </p>
                 </div>
               </div><!-- end .row -->

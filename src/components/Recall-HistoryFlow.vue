@@ -3,10 +3,6 @@
     <div class="card">
       <div class="row justify-content-center p-2">
         <h2>历史流量分析</h2>
-        <!--<form method="post" action="http://10.5.0.224:8000/rest/download_pcap/" target="_blank">-->
-        <!--<input type="text" name="file_path" value="/tmp/tmp8g4gr_fu.pcap"/>-->
-        <!--<input type="submit" value="Submit"/>-->
-        <!--</form>-->
       </div>
       <div class="row">
         <div class="col-md-12 ">
@@ -20,10 +16,10 @@
             <!--</div>-->
             <div class="form-inline">
               <label for="time-start" class="mr-sm-2">开始时间</label>
-              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" v-model="start_time"
+              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="datetime-local" v-model="start_time"
                      id="time-start">
               <label for="time-end" class="mr-sm-2">结束时间</label>
-              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" v-model="end_time"
+              <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="datetime-local" v-model="end_time"
                      id="time-end">
               <button role="button" type="button" class="btn btn-primary mr-sm-2" v-on:click="changeTime()">更新</button>
               <button role="button" type="button" class="btn btn-secondary" @click="downloadHistory()">下载流量记录</button>
@@ -32,10 +28,51 @@
         </div>
       </div>
       <div class="row">
-        <div id="master-container" class="col-12" style="height:400px"></div>
+        <div id="master-container" class="col-9" style="height:400px"></div>
+        <div class="col-md-3">
+          <div class="d-flex flex-column">
+            <div class="d-flex flex-row">
+              <div id="pie-container" style="width: 100%; height:400px;"></div>
+            </div>
+            <div class="d-flex flex-row justify-content-around" style="height: 38px">
+              <div class="btn-group" role="group">
+                <button role='button' type="button" class="btn btn-sm btn-secondary"
+                        v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">流量
+
+
+                </button>
+                <button role='button' type="button" class="btn btn-sm btn-secondary"
+                        v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">包数
+
+
+                </button>
+              </div>
+              <div class="d-flex flex-row" v-if="hasPartition">
+                <div class="form-check form-check-inline d-flex align-items-center">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="radio_total" id="radio_total"
+                           value="total" v-model="partition_type" @click="changePartition('total')">总
+                  </label>
+                </div>
+                <div class="form-check form-check-inline d-flex align-items-center">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="radio_download" id="radio_download"
+                           value="download" v-model="partition_type" @click="changePartition('download')">接收
+                  </label>
+                </div>
+                <div class="form-check form-check-inline d-flex align-items-center">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="radio_upload" id="radio_upload"
+                           value="upload" v-model="partition_type" @click="changePartition('upload')">发送
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           <div class="card-head">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs nav-fill" role="tablist">
@@ -69,10 +106,10 @@
                 <tr>
                   <th>IP</th>
                   <th>节点名称</th>
-                  <th>下载流量</th>
-                  <th>上传流量</th>
-                  <th>下载包数</th>
-                  <th>上传包数</th>
+                  <th>接收流量</th>
+                  <th>发送流量</th>
+                  <th>接收包数</th>
+                  <th>发送包数</th>
                 </tr>
                 </thead>
               </table>
@@ -93,13 +130,13 @@
                 <thead class="thead-default">
                 <tr>
                   <th>源IP</th>
-                  <th>源<br/>节点</th>
+                  <th>源节点</th>
                   <th>目的IP</th>
-                  <th>目的<br/>节点</th>
-                  <th>下载<br/>流量</th>
-                  <th>上传<br/>流量</th>
-                  <th>下载<br/>包数</th>
-                  <th>上传<br/>包数</th>
+                  <th>目的节点</th>
+                  <th>接收流量</th>
+                  <th>发送流量</th>
+                  <th>接收包数</th>
+                  <th>发送包数</th>
                   <th>协议</th>
                 </tr>
                 </thead>
@@ -110,13 +147,13 @@
                 <thead class="thead-default">
                 <tr>
                   <th>源IP</th>
-                  <th>源<br/>节点</th>
+                  <th>源节点</th>
                   <th>目的IP</th>
-                  <th>目的<br/>节点</th>
-                  <th>下载<br/>流量</th>
-                  <th>上传<br/>流量</th>
-                  <th>下载<br/>包数</th>
-                  <th>上传<br/>包数</th>
+                  <th>目的节点</th>
+                  <th>接收流量</th>
+                  <th>发送流量</th>
+                  <th>接收包数</th>
+                  <th>发送包数</th>
                 </tr>
                 </thead>
               </table>
@@ -126,56 +163,19 @@
                 <thead class="thead-default">
                 <tr>
                   <th>源IP</th>
-                  <th>源<br/>节点</th>
+                  <th>源节点</th>
                   <th>目的IP</th>
-                  <th>目的<br/>节点</th>
-                  <th>下载<br/>流量</th>
-                  <th>上传<br/>流量</th>
-                  <th>下载<br/>包数</th>
-                  <th>上传<br/>包数</th>
+                  <th>目的节点</th>
+                  <th>接收流量</th>
+                  <th>发送流量</th>
+                  <th>接收包数</th>
+                  <th>发送包数</th>
                 </tr>
                 </thead>
               </table>
             </div>
           </div>
 
-        </div>
-        <div class="col-md-4">
-          <div class="d-flex flex-column">
-            <div class="d-flex flex-row justify-content-around" style="height: 38px">
-              <div class="btn-group" role="group">
-                <button role='button' type="button" class="btn btn-secondary"
-                        v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">流量
-                </button>
-                <button role='button' type="button" class="btn btn-secondary"
-                        v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">包数
-                </button>
-              </div>
-              <div class="d-flex flex-row" v-if="hasPartition">
-                <div class="form-check form-check-inline d-flex align-items-center">
-                  <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="radio_total" id="radio_total"
-                           value="total" v-model="partition_type" @click="changePartition('total')">总
-                  </label>
-                </div>
-                <div class="form-check form-check-inline d-flex align-items-center">
-                  <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="radio_download" id="radio_download"
-                           value="download" v-model="partition_type" @click="changePartition('download')">下载
-                  </label>
-                </div>
-                <div class="form-check form-check-inline d-flex align-items-center">
-                  <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="radio_upload" id="radio_upload"
-                           value="upload" v-model="partition_type" @click="changePartition('upload')">上传
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="d-flex flex-row">
-              <div id="pie-container" style="width: 100%; height:640px;"></div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -199,7 +199,7 @@
     'endpoint': [
       {"data": "ip"},
       {"data": "ip_node"},
-      {"data": "rx"},
+      {"data": "rx",},
       {"data": "tx"},
       {"data": "rx_packets"},
       {"data": "tx_packets"},
@@ -307,8 +307,8 @@
     'packet': '包数',
     'flow': '流量',
     'total': '总',
-    'download': '下载',
-    'upload': '上传',
+    'download': '接收',
+    'upload': '发送',
   };
   //用于可下钻的饼图
   //  const choice_type = {
@@ -347,9 +347,10 @@
         self.customDataTable();
         //1. 初始化起止时间：最近一天
         let date = new Date();
-        self.end_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate();
+        self.end_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + self.formatMon(date.getDate()) + 'T00:00:00';
         date.setDate(date.getDate() - 1);
-        self.start_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + date.getDate();
+        self.start_time = date.getFullYear() + '-' + self.formatMon(date.getMonth() + 1) + '-' + self.formatMon(date.getDate()) + 'T00:00:00';
+        console.log(self.start_time);
         //2.创建图表Master，并设置数据
         self.createMaster();
         self.reloadMaster();
@@ -359,6 +360,15 @@
         self.partition_type = 'total';
 //        self.getData(); //使用DataTable后，由DataTable发起ajax请求，故不需要调用该方法
         self.changeType(self.data_type);
+      },
+      checkTime(time){
+        //仅检查时间部分
+        console.log('check time ', time);
+        let date = time.split('T');
+        let loc_time = date[1].split(':');
+        if (loc_time.length != 3)
+          return time + ':01';
+        return time;
       },
       customDataTable(){
         $.fn.dataTableExt.aTypes.push(
@@ -422,19 +432,19 @@
         let loc_url = '';
         switch (type) {
           case 'endpoint':
-            loc_url = process.env.DATA_ENDPOINT;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_ENDPOINT;
             break;
           case 'application':
-            loc_url = process.env.DATA_APPLICATION;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_APPLICATION;
             break;
           case 'ip':
-            loc_url = process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
             break;
           case 'tcp':
-            loc_url = process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
             break;
           case 'udp':
-            loc_url = process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
             break;
         }
         //替换loc_url中的占位符{start_time}和{end_time}
@@ -451,13 +461,13 @@
       //
       //        switch (type) {
       //          case 'endpoint':
-      //            resource = self.$resource(process.env.DATA_ENDPOINT);
+      //            resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_ENDPOINT);
       //            break;
       //          case 'application':
-      //            resource = self.$resource(process.env.DATA_APPLICATION);
+      //            resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_APPLICATION);
       //            break;
       //          case 'conv':
-      //            resource = self.$resource(process.env.DATA_CONVERSATION);
+      //            resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION);
       //            break;
       //        }
       //        return resource.get({ start_time: '2017-03-01', end_time: '2017-03-31' })
@@ -472,9 +482,8 @@
       //      },
       getMasterData: function () {
         const self = this;
-        const suffix = 'T00:00:00';
-        const resource = self.$resource(process.env.DATA_HISTORY);
-        return resource.get({start_time: self.start_time + suffix, end_time: self.end_time + suffix})
+        const resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_HISTORY);
+        return resource.get({start_time: self.start_time, end_time: self.end_time})
           .then(res => {
 //            console.log(res.data);
             return res.data;
@@ -500,8 +509,11 @@
             loc_data['packets'].push([time, tag_m ? (item.packets / 1000) : (item.packets)]);
           });
           self.data_history = loc_data;
+//          console.log(self.data_history);
           self.master.series[0].setData(self.data_history['flow']);
           self.master.series[1].setData(self.data_history['packets']);
+          self.master.hideLoading();
+          console.log('tag_m', tag_m);
           if (!tag_m) {
             self.master.update({
               yAxis: [{
@@ -514,12 +526,13 @@
                 },
               }],
               series: [{
-                tootip: {
-                  valueSuffix: 'KB'
+                tooltip: {
+                  valueSuffix: 'KB',
+                  valueDecimals: 2,
                 }
               }, {
-                tootip: {
-                  valueSuffix: '/s'
+                tooltip: {
+                  valueSuffix: ''
                 }
               }],
             });
@@ -530,6 +543,10 @@
       //更改显示的数据的时间
       changeTime: function () {
         const self = this;
+        self.pie.showLoading();
+        self.master.showLoading();
+        self.start_time = self.checkTime(self.start_time);
+        self.end_time = self.checkTime(self.end_time);
         //由于v-model将数据与dom元素绑定，不需传入参数或手动赋值
         self.reloadMaster();
         self.reloadTable();//由于ajax的异步问题，pie的reload在datatable的ajax属性中调用
@@ -543,6 +560,7 @@
       changeChoice: function (type) {
         const self = this;
         self.pie_choice = type;
+        self.pie.showLoading();
         self.setChoice(type);
         //切换choice时，将Partition重置为total
         self.setPartition('total');
@@ -550,6 +568,7 @@
       },
       changePartition: function (type) {
         const self = this;
+        self.pie.showLoading();
         self.setPartition(type);
         self.setPieData();
       },
@@ -562,6 +581,16 @@
         let element = element = $('#table_' + type);
 
         self.table = element.DataTable({
+//          "columnDefs": [ {
+//            "targets": [2,3],
+//            "createdCell": function (td, cellData, rowData, row, col) {
+//              console.log("---");
+//              if ( cellData < 1 ) {
+//                console.log(cellData);
+//                $(td).css('color', 'red')
+//              }
+//            }
+//          } ],
           "processing": true,
           "lengthChange": false,
           language: {
@@ -584,7 +613,6 @@
             "url": '' + loc_url,
             "dataSrc": function (json) {
               let loc_data = json;
-              console.log("---------------");
               if (self.data_type === 'tcp')
                 loc_data = json.filter(item => item.ip_type == 44);
               else if (self.data_type === 'udp')
@@ -592,8 +620,7 @@
               let res = loc_data.map(ajax_process[type]);
 //              console.log(res);
               self.data_table = res;//为饼图提供数据
-              self.createPie(self.data_type);
-              console.log("---------------");
+              self.createPie();
               return res;
             },
           },
@@ -609,9 +636,37 @@
       },
       createMaster: function () {
         const self = this;
+        Highcharts.setOptions({
+          lang: {
+            loading: '数据加载中...'  // 加载中文字配置
+          }
+        });
         self.master = new Highcharts.chart('master-container', {
           chart: {
-            zoomType: 'x'
+            zoomType: 'x',
+            type: 'areaspline',
+            events: {
+              selection: function (event) {
+                let loc_min = event.xAxis[0].min;
+                let loc_max = event.xAxis[0].max;
+                if ((loc_max - loc_min) < 3 * 60 * 1000)
+                  loc_max = loc_min + 3 * 60 * 1000;
+                let current = new Date().getTime();
+                if (loc_max > current) {
+                  loc_max = current;
+                  loc_min = loc_max - 3 * 60 * 1000;
+                }
+                let loc_start = Highcharts.dateFormat('%Y-%m-%dT%H:%M:%S', loc_min);
+                let loc_end = Highcharts.dateFormat('%Y-%m-%dT%H:%M:%S', loc_max);
+                console.log(loc_start, ' ', loc_end);
+
+                self.start_time = loc_start;
+                self.end_time = loc_end;
+                self.changeTime();
+
+                return false;
+              }
+            },
           },
           title: {
             text: '历史流量图'
@@ -675,49 +730,46 @@
             enabled: false
           },
           plotOptions: {
-            area: {
-              fillColor: {
-                linearGradient: {
-                  x1: 0,
-                  y1: 0,
-                  x2: 0,
-                  y2: 1
-                },
-                stops: [
-                  [0, Highcharts.getOptions().colors[0]],
-                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0.5).get('rgba')]
-                ]
-              },
+            areaspline: {
               marker: {
-                radius: 2
+                enabled: false,
+                symbol: 'circle',
+                radius: 2,
+                states: {
+                  hover: {
+                    enabled: true
+                  }
+                }
               },
-              lineWidth: 1,
+              lineWidth: 2,
               states: {
                 hover: {
-                  lineWidth: 1
+                  lineWidth: 3
                 }
               },
             }
           },
           series: [{
-            type: 'area',
             name: '流量',
 //            pointInterval: 24 * 3600 * 1000,
 //            pointStart: Date.UTC(2014, 2, 18),
             data: [],
-            tootip: {
-              valueSuffix: 'MB'
-            }
+            tooltip: {
+              valueSuffix: 'MB',
+              valueDecimals: 2,
+            },
+            fillOpacity: 0.4
           }, {
-            type: 'area',
             name: '包数',
             yAxis: 1,
             data: [],
-            tootip: {
-              valueSuffix: 'K/s'
-            }
+            tooltip: {
+              valueSuffix: 'K'
+            },
+            fillOpacity: 0.3
           }],
         });
+        self.master.showLoading();
       },
       createPie: function () {
         const self = this;
@@ -732,6 +784,7 @@
 //        } else {
         self.createSimplePie();
 //        }
+        self.pie.showLoading();
         self.setPieData();
       },
       setChoice: function (type) {
@@ -882,6 +935,12 @@
         self.data_pie = loc_data.sort((a, b) => {
           return (a[1] > b[1]) ? -1 : ((a[1] < b[1]) ? 1 : 0);
         });
+        if (self.pie != null)
+          self.pie.update({
+            series: [{
+              name: '各' + language[self.data_type] + language[self.partition_type] + language[self.pie_choice],
+            }]
+          })
       },
       setPieData: function () {
         const self = this;
@@ -893,9 +952,15 @@
         });
         loc.push(['其它', val_other]);
         self.pie.series[0].setData(loc);
+        self.pie.hideLoading();
       },
       createSimplePie(){
         const self = this;
+        Highcharts.setOptions({
+          lang: {
+            loading: '数据加载中...'  // 加载中文字配置
+          }
+        });
         self.pie = new Highcharts.chart('pie-container', {
           chart: {
             plotBackgroundColor: null,
@@ -912,8 +977,8 @@
           },
           plotOptions: {
             pie: {
-              center: [150, 150],
-              size: 300,
+              center: [100, 100],
+              size: 200,
               allowPointSelect: true,
               cursor: 'pointer',
               dataLabels: {
@@ -924,16 +989,18 @@
           },
           legend: {
             //在下方水平展示
-//            maxHeight: 200,
-//            align: 'left',
-//            verticalAlign: 'bottom',
+            x: 0,
+            y: 50,
+            maxHeight: 80,
+            align: 'left',
+            verticalAlign: 'top',
 
             //在右方垂直展示
-            align: 'right',
-            verticalAlign: 'top',
-            x: 0,
-            y: 100,
-            layout: 'vertical',
+//            align: 'right',
+//            verticalAlign: 'top',
+//            x: 0,
+//            y: 100,
+//            layout: 'vertical',
           },
           series: [{
             type: 'pie',
@@ -941,50 +1008,60 @@
             data: [],
           }]
         });
+        self.pie.showLoading();
       },
-      //todo:下载
       downloadHistory: function () {
         const self = this;
-//        let id_resource = self.$resource(process.env.ID_PCAP);
-//        let url_resource = self.$resource(process.env.INFO_PCAP);
-        let result_resource = self.$resource(process.env.FILE_PCAP);
-//
-//        let task_id = id_resource.get({ start_time: self.start_time, end_time: self.end_time })
-//          .then(res => {
-//            console.log(res);
-//            console.log(res.data);
-//            return res.data;
-//          })
-//          .catch(err => {
-//            console.error(err);
-//          });
-//        task_id.then(res=>{
-//          let finished = false;
-//          let res_url;
-////          for(!finished) {
-////            task_id.then();
-////          }
-//        });
-        //方法1
-        result_resource.save({'file_path': "/tmp/tmp8g4gr_fu.pcap"}).then(res => {
-          console.log(res);
-        });
-        //方法2
-        $("#downloadform").remove();
-        var form = $("<form>");//定义一个form表单
-        form.attr("id", "downloadform");
-        form.attr("style", "display:none");
-        form.attr("target", "_blank");
-        form.attr("method", "post");
-        form.attr("action", "http://10.5.0.224:8000/rest/download_pcap/");
-        var input1 = $("<input>");
-        input1.attr("type", "text");
-        input1.attr("name", "file_path");
-        input1.attr("value", "/tmp/tmp8g4gr_fu.pcap");
-        form.append(input1);
-        $("body").append(form);//将表单放置在web中
+        const id_resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.ID_PCAP);
+        const url_resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.INFO_PCAP);
 
-        form.submit();//表单提交
+        let task_id = id_resource.get({start_time: self.start_time, end_time: self.end_time})
+          .then(res => {
+            console.log('get task_id: ');
+            console.log(res.data);
+            return res.data;
+          })
+          .catch(err => {
+            console.error(err);
+          });
+        console.log('---1---');
+        task_id.then(res => {
+          let task_id = res.task_id;
+          let finished = false;
+          let res_url;
+          let loc_timer = setInterval(() => {
+            if (!finished) {
+              res_url = url_resource.get({task_id: task_id})
+                .then(res => {
+                  return res.data;
+                });
+              console.log('---2---');
+              res_url.then(res => {
+                console.log('get file_path: ');
+                if (res.state === 'SUCCESS') {
+                  finished = true;
+                  $("#downloadform").remove();
+                  var form = $("<form>");//定义一个form表单
+                  form.attr("id", "downloadform");
+                  form.attr("style", "display:none");
+                  form.attr("target", "");
+                  form.attr("method", "post");
+                  form.attr("action", window.location.protocol+'//'+window.location.hostname+process.env.FILE_PCAP);
+                  var input1 = $("<input>");
+                  input1.attr("type", "text");
+                  input1.attr("name", "file_path");
+                  input1.attr("value", res.result);
+                  form.append(input1);
+                  $("body").append(form);//将表单放置在web中
+
+                  form.submit();//表单提交
+                }
+              });
+            } else {
+              clearInterval(loc_timer);
+            }
+          }, 2000);
+        });
       },
     },
     mounted: function () {
@@ -1002,6 +1079,9 @@
     height: 100%
     /*&:first-child*/
       /*padding-top: 0*/
+    .table
+      th, td
+        padding: 0.5em
     .card
       position: relative
       margin-bottom: 24px

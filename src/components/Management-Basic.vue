@@ -1,12 +1,17 @@
 <template>
   <div id="basic-management">
-    <iframe id="Frame1" src="http://10.5.0.224:8000/admin/" allowTransparency="true" width="100%"></iframe>
+    <iframe id="Frame1" :src="url" allowTransparency="true" width="100%"></iframe>
   </div>
 </template>
 
 <script>
   export default {
     name: 'basic-management',
+    data: function () {
+      return {
+          'url':window.location.protocol+'//'+window.location.hostname+process.env.CONFIG
+      };
+    }
   };
 </script>
 
