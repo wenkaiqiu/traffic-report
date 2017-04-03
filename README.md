@@ -1,5 +1,5 @@
 # traffic-report
-
+[![Build Status](https://travis-ci.org/ttaanngg/traffic-report.svg?branch=master)](https://travis-ci.org/ttaanngg/traffic-report)
 > A font end work. Build by vue-cli.
 
 ## Build Setup
