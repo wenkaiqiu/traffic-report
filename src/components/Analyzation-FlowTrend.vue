@@ -24,7 +24,7 @@
 <script>
   import Highcharts from 'highcharts';
   require('highcharts/highcharts-more')(Highcharts);
-
+  const unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   export default {
     name: 'real-time',
     data: function () {
@@ -53,18 +53,25 @@
           else
             loc_data = loc_base;
         }
-        return this.toKB(loc_data);
+        return loc_data;
       },
-      toKB(Bytes){
-        return Bytes / 1024;
+      formatFlow(data){
+        let loc_data = data;
+        let suffix = 'B';
+        if (loc_data > 0) {
+          for (let i = 1; loc_data / 1024 >= 1; i++) {
+            loc_data /= 1024;
+            suffix = unit[i];
+          }
+        }
+        return loc_data.toFixed(3) + suffix;
       },
       changeInterval(interval){
         const self = this;
         self.chart.showLoading();
         self.interval = interval;
         const loc_interval = self.interval;
-        const resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_PREDICT);
-        console.log(loc_interval);
+        const resource = self.$resource(window.location.protocol + '//' + window.location.hostname + process.env.DATA_PREDICT);
         self.getTaskId().then(response => {
           let finished = false;
           console.log(response.task_id);
@@ -83,7 +90,7 @@
           ;
           let loc_timer = setInterval(() => {
             console.log(!finished);
-            console.log(window.location.protocol+'//'+window.location.hostname+process.env.DATA_PREDICT);
+            console.log(window.location.protocol + '//' + window.location.hostname + process.env.DATA_PREDICT);
             if (!finished) {
               resource.get({task_id: response.task_id})
                 .then(res => {
@@ -94,7 +101,7 @@
                     let loc_data = [[], []];
                     res.data.result.result.forEach(item => {
                       let loc_time = new Date(item.ds).getTime();
-                      loc_data[0].push([loc_time, self.toKB(item.yhat)]);
+                      loc_data[0].push([loc_time, item.yhat]);
                       loc_data[1].push([loc_time, self.formatData(item.yhat_lower, item.yhat, 0), self.formatData(item.yhat_upper, item.yhat, 1)]);
                     });
                     console.log(loc_data);
@@ -122,11 +129,11 @@
       },
       getTaskId: function () {
         const self = this;
-        const resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.INFO_PREDICT + self.interval + '/');
-        console.log('Predict Info: ', window.location.protocol+'//'+window.location.hostname+process.env.INFO_PREDICT + self.interval + '/')
+        const resource = self.$resource(window.location.protocol + '//' + window.location.hostname + process.env.INFO_PREDICT + self.interval + '/');
+        console.log('Predict Info: ', window.location.protocol + '//' + window.location.hostname + process.env.INFO_PREDICT + self.interval + '/')
         return resource.get()
           .then(res => {
-            console.log(res.data);
+//            console.log(res.data);
             return res.data;
           })
           .catch(err => {
@@ -135,7 +142,6 @@
       },
       predictWeek: function (data) {
         const self = this;
-        console.log("1111111");
         this.chart.series[0].setData(data[0]);
         this.chart.series[1].setData(data[1]);
         self.chart.hideLoading();
@@ -148,7 +154,6 @@
       },
       predictMon: function (data) {
         const self = this;
-        console.log("2222222");
         this.chart.series[0].setData(data[0]);
         this.chart.series[1].setData(data[1]);
         self.chart.hideLoading();
@@ -161,7 +166,6 @@
       },
       predictYear: function (data) {
         const self = this;
-        console.log("333333");
         this.chart.series[0].setData(data[0]);
         this.chart.series[1].setData(data[1]);
         self.chart.hideLoading();
@@ -176,7 +180,7 @@
         const self = this;
         self.chart = new Highcharts.chart('container', {
           title: {
-            text: '流速趋势图'
+            text: '流量趋势图'
           },
           xAxis: {
             type: 'datetime',
@@ -186,9 +190,15 @@
             }
           },
           yAxis: {
+            labels: {
+              formatter: function () {
+                return self.formatFlow(this.value);
+              },
+            },
             title: {
               text: null
-            }
+            },
+            min: 0,
           },
           tooltip: {
             crosshairs: true,
@@ -208,8 +218,11 @@
               lineColor: Highcharts.getOptions().colors[0]
             },
             tooltip: {
-              valueDecimals: 2,
-            }
+              pointFormatter: function () {
+                return '<span style="color:' + Highcharts.getOptions().colors[0] + '">\u25CF</span> ' + this.series.name + ': <b>' + self.formatFlow(this.y) + '</b><br/>';
+              },
+              valueDecimals: 3,
+            },
           }, {
             name: '范围',
             data: [],
@@ -220,8 +233,11 @@
             fillOpacity: 0.3,
             zIndex: 0,
             tooltip: {
-              valueDecimals: 2,
-            }
+              pointFormatter: function () {
+                return '<span style="color:' + Highcharts.getOptions().colors[0] + '">\u25CF</span> ' + this.series.name + ': <b>' + self.formatFlow(this.low) + ' - ' + self.formatFlow(this.high) + '</b><br/>';
+              },
+              valueDecimals: 3,
+            },
           }]
         });
       },

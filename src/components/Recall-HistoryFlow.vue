@@ -38,13 +38,9 @@
               <div class="btn-group" role="group">
                 <button role='button' type="button" class="btn btn-sm btn-secondary"
                         v-bind:class="{'active': pie_choice==='flow'}" @click="changeChoice('flow')">流量
-
-
                 </button>
                 <button role='button' type="button" class="btn btn-sm btn-secondary"
                         v-bind:class="{'active': pie_choice==='packet'}" @click="changeChoice('packet')">包数
-
-
                 </button>
               </div>
               <div class="d-flex flex-row" v-if="hasPartition">
@@ -298,6 +294,13 @@
     },
 
   };
+  const formatColums = {
+    'endpoint':[[2,3],[4,5]],
+    'application': [[1],[2]],
+    'ip':[[4,5],[6,7]],
+    'tcp':[[4,5],[6,7]],
+    'udp':[[4,5],[6,7]],
+  };
   const language = {
     'endpoint': '节点信息',
     'application': '应用信息',
@@ -318,6 +321,8 @@
   //    'tcp': true,
   //    'udp': true,
   //  };
+  const unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const unit2 = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
   export default {
     name: 'history-flow',
     data: function () {
@@ -418,33 +423,49 @@
           return ret;//最终只可能是0
         };
       },
+      formatData(data){
+        let loc_data = data;
+        let suffix = 'B';
+        if (loc_data > 0) {
+          for (let i = 1; loc_data / 1024 >= 1; i++) {
+            loc_data /= 1024;
+            suffix = unit[i];
+          }
+        }
+        return loc_data.toFixed(3) + suffix;
+      },
+      formatData2(data){
+        let loc_data = data;
+        let suffix = '';
+        if (loc_data > 0) {
+          for (let i = 1; loc_data / 1000 >= 1; i++) {
+            loc_data /= 1000;
+            suffix = unit2[i];
+          }
+        }
+        return loc_data.toFixed(3) + suffix;
+      },
       formatMon(mon){
         return '' + Math.floor(mon / 10) + mon % 10;
-      },
-      toKB(Bytes){
-        return Bytes / 1024;
-      },
-      toMB(Bytes){
-        return Bytes / 1024 / 1024;
       },
       getURL: function (type) {
         const self = this;
         let loc_url = '';
         switch (type) {
           case 'endpoint':
-            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_ENDPOINT;
+            loc_url = window.location.protocol + '//' + window.location.hostname + process.env.DATA_ENDPOINT;
             break;
           case 'application':
-            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_APPLICATION;
+            loc_url = window.location.protocol + '//' + window.location.hostname + process.env.DATA_APPLICATION;
             break;
           case 'ip':
-            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol + '//' + window.location.hostname + process.env.DATA_CONVERSATION;
             break;
           case 'tcp':
-            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol + '//' + window.location.hostname + process.env.DATA_CONVERSATION;
             break;
           case 'udp':
-            loc_url = window.location.protocol+'//'+window.location.hostname+process.env.DATA_CONVERSATION;
+            loc_url = window.location.protocol + '//' + window.location.hostname + process.env.DATA_CONVERSATION;
             break;
         }
         //替换loc_url中的占位符{start_time}和{end_time}
@@ -482,7 +503,7 @@
       //      },
       getMasterData: function () {
         const self = this;
-        const resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.DATA_HISTORY);
+        const resource = self.$resource(window.location.protocol + '//' + window.location.hostname + process.env.DATA_HISTORY);
         return resource.get({start_time: self.start_time, end_time: self.end_time})
           .then(res => {
 //            console.log(res.data);
@@ -495,9 +516,6 @@
       reloadMaster(){
         const self = this;
         let diff = new Date(self.end_time) - new Date(self.start_time);
-        let tag_m = true;
-        if (diff <= 24 * 60 * 60 * 1000)
-          tag_m = false;
         self.getMasterData().then(res => {
           let loc_data = {
             'flow': [],
@@ -505,38 +523,14 @@
           };
           res.forEach(item => {
             let time = new Date(item.ticker).getTime();
-            loc_data['flow'].push([time, tag_m ? self.toMB(item.bytes) : self.toKB(item.bytes)]);
-            loc_data['packets'].push([time, tag_m ? (item.packets / 1000) : (item.packets)]);
+            loc_data['flow'].push([time, item.bytes]);
+            loc_data['packets'].push([time, item.packets]);
           });
           self.data_history = loc_data;
 //          console.log(self.data_history);
           self.master.series[0].setData(self.data_history['flow']);
           self.master.series[1].setData(self.data_history['packets']);
           self.master.hideLoading();
-          console.log('tag_m', tag_m);
-          if (!tag_m) {
-            self.master.update({
-              yAxis: [{
-                labels: {
-                  format: '{value}KB',
-                },
-              }, {
-                labels: {
-                  format: '{value}/s',
-                },
-              }],
-              series: [{
-                tooltip: {
-                  valueSuffix: 'KB',
-                  valueDecimals: 2,
-                }
-              }, {
-                tooltip: {
-                  valueSuffix: ''
-                }
-              }],
-            });
-          }
         });
 
       },
@@ -581,16 +575,22 @@
         let element = element = $('#table_' + type);
 
         self.table = element.DataTable({
-//          "columnDefs": [ {
-//            "targets": [2,3],
-//            "createdCell": function (td, cellData, rowData, row, col) {
-//              console.log("---");
-//              if ( cellData < 1 ) {
-//                console.log(cellData);
-//                $(td).css('color', 'red')
-//              }
-//            }
-//          } ],
+          "columnDefs": [{
+            "targets": formatColums[self.data_type][0],
+            "createdCell": function (td, cellData, rowData, row, col) {
+              $(td).attr('data-order', cellData);
+              cellData = self.formatData(cellData);
+              $(td).html(cellData);
+            }
+          },
+            {
+              "targets": formatColums[self.data_type][1],
+              "createdCell": function (td, cellData, rowData, row, col) {
+                $(td).attr('data-order', cellData);
+                cellData = self.formatData2(cellData);
+                $(td).html(cellData);
+              }
+            }],
           "processing": true,
           "lengthChange": false,
           language: {
@@ -700,7 +700,9 @@
           },
           yAxis: [{
             labels: {
-              format: '{value}MB',
+              formatter: function () {
+                return self.formatData(this.value);
+              },
               style: {
                 color: Highcharts.getOptions().colors[1]
               }
@@ -713,7 +715,6 @@
             }
           }, {
             labels: {
-              format: '{value}K/s',
               style: {
                 color: Highcharts.getOptions().colors[0]
               },
@@ -751,20 +752,25 @@
           },
           series: [{
             name: '流量',
-//            pointInterval: 24 * 3600 * 1000,
-//            pointStart: Date.UTC(2014, 2, 18),
+            color: Highcharts.getOptions().colors[1],
             data: [],
             tooltip: {
-              valueSuffix: 'MB',
-              valueDecimals: 2,
+              pointFormatter: function () {
+                return '<span style="color:' + Highcharts.getOptions().colors[1] + '">\u25CF</span> ' + this.series.name + ': <b>' + self.formatData(this.y) + '</b><br/>';
+              },
+              valueDecimals: 3,
             },
             fillOpacity: 0.4
           }, {
             name: '包数',
+            color: Highcharts.getOptions().colors[0],
             yAxis: 1,
             data: [],
             tooltip: {
-              valueSuffix: 'K'
+              pointFormatter: function () {
+                return '<span style="color:' + Highcharts.getOptions().colors[0] + '">\u25CF</span> ' + this.series.name + ': <b>' + self.formatData2(this.y) + '</b><br/>';
+              },
+              valueDecimals: 3,
             },
             fillOpacity: 0.3
           }],
@@ -1012,8 +1018,8 @@
       },
       downloadHistory: function () {
         const self = this;
-        const id_resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.ID_PCAP);
-        const url_resource = self.$resource(window.location.protocol+'//'+window.location.hostname+process.env.INFO_PCAP);
+        const id_resource = self.$resource(window.location.protocol + '//' + window.location.hostname + process.env.ID_PCAP);
+        const url_resource = self.$resource(window.location.protocol + '//' + window.location.hostname + process.env.INFO_PCAP);
 
         let task_id = id_resource.get({start_time: self.start_time, end_time: self.end_time})
           .then(res => {
@@ -1046,7 +1052,7 @@
                   form.attr("style", "display:none");
                   form.attr("target", "");
                   form.attr("method", "post");
-                  form.attr("action", window.location.protocol+'//'+window.location.hostname+process.env.FILE_PCAP);
+                  form.attr("action", window.location.protocol + '//' + window.location.hostname + process.env.FILE_PCAP);
                   var input1 = $("<input>");
                   input1.attr("type", "text");
                   input1.attr("name", "file_path");
