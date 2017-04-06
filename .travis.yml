@@ -6,3 +6,5 @@ install:
   - npm rebuild node-sass
 test:
   - npm build
+script:
+  - npm run build
