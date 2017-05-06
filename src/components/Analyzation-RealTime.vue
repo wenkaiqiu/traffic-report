@@ -213,6 +213,7 @@
                 // set up the updating of the chart each second
                 let series = this.series,
                   chart = this;
+                let last = [0,0,0];
                 //每5s获取一次数据
                 self.timer = setInterval(function () {
                   let loc_data = self.getData().then(res => {
@@ -224,10 +225,25 @@
                         let s1 = data_init[0][i];
                         let s2 = data_init[1][i];
                         let s3 = data_init[2][i];
-                        series[0].addPoint([s1.x, s1.y], true, true);
-                        series[1].addPoint([s2.x, s2.y], true, true);
-                        series[2].addPoint([s3.x, s3.y], true, true);
+//                        let diffy_1 = (s1.y-last[0].y)/10;
+//                        let diffy_2 = (s2.y-last[1].y)/10;
+//                        let diffy_3 = (s3.y-last[2].y)/10;
+//                        for(let i=1;i<=9;i++){
+//                          setTimeout(function () {
+//                            series[0].addPoint([last[0].x+100*i, last[0].y+diffy_1*i], true, true);
+//                            series[1].addPoint([last[1].x+100*i, last[1].y+diffy_2*i], true, true);
+//                            series[2].addPoint([last[2].x+100*i, last[2].y+diffy_3*i], true, true);
+//                            activeLastPointToolip(chart);
+//                          }, i*100);
+//                        }
+                        series[0].addPoint([s1.x, s1.y], false, true);
+                        series[1].addPoint([s2.x, s2.y], false, true);
+                        series[2].addPoint([s3.x, s3.y], false, true);
+                        chart.redraw();
                         activeLastPointToolip(chart);
+                        last[0]=s1;
+                        last[1]=s2;
+                        last[2]=s3;
                       }, i*1000);
                     }
                   });
