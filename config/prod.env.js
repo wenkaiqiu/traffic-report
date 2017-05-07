@@ -11,6 +11,9 @@ module.exports = {
   FILE_PCAP: '":8000/rest/download_pcap/"',
   INFO_PREDICT: '":8000/rest/predict/"',
   DATA_PREDICT: '":8000/rest/get_prediction/?task_id={task_id}"',
-  CONFIG: '":8000/admin/"'
+  CONFIG: '":8000/admin/"',
+  INFO_STORAGE: '":8000/rest/storage_info/"',
+  INFO_RUNTIME: '":8000/rest/run_time/"',
+  INFO_TAPE: '":8000/rest/tape/"',
   // PORT: 9000
 }
