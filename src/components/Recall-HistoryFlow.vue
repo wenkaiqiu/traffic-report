@@ -639,7 +639,8 @@
         Highcharts.setOptions({
           lang: {
             loading: '数据加载中...'  // 加载中文字配置
-          }
+          },
+          global: { useUTC: true },
         });
         self.master = new Highcharts.chart('master-container', {
           chart: {
