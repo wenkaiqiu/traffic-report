@@ -20,6 +20,9 @@
       <router-link tag="li" to="/dashboard/configuration-management">
         <a><div class="gui-icon"><i class="md md-settings-applications"></i></div></a>
       </router-link>
+      <router-link tag="li" to="/dashboard/instruction">
+        <a><div class="gui-icon"><i class="md md-description"></i></div></a>
+      </router-link>
     </ul>
   </div>
 </template>

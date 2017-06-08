@@ -8,6 +8,7 @@ import ConfigurationManagement from '@/components/Management-Configuration';
 import DataPackage from '@/components/Recall-DataPackage';
 import HistoryFlow from '@/components/Recall-HistoryFlow';
 import Login from '@/components/Login';
+import Instruction from '@/components/Instruction';
 
 Vue.use(Router);
 
@@ -32,6 +33,11 @@ export default new Router({
           path: 'flow-trend',
           name: 'flow-trend',
           component: FlowTrend,
+        },
+        {
+          path: 'instruction',
+          name: 'instruction',
+          component: Instruction,
         },
         {
           path: 'real-time',

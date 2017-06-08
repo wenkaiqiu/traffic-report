@@ -1,6 +1,6 @@
 module.exports = {
   NODE_ENV: '"production"',
-  BASE_URL: '"http://10.5.0.224:8000/"',
+  BASE_URL: '"http://127.0.0.1:8000/"',
   DATA_REALTIME: '":8000/rest/past_300/"',
   DATA_HISTORY: '":8000/rest/history/?start_time={start_time}&end_time={end_time}"',
   DATA_ENDPOINT: '":8000/rest/range_query/endpoint/?start_time={start_time}&end_time={end_time}"',

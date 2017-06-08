@@ -7,13 +7,6 @@
       <div class="row">
         <div class="col-md-12 ">
           <div class="d-flex flex-row justify-content-around chart-menubar">
-            <!--<div class="btn-group" role="group" aria-label="Time interval">-->
-            <!--<span class="my-sapn mr-sm-2">时间间隔</span>-->
-            <!--<button role="button" type="button" class="btn btn-secondary">min</button>-->
-            <!--<button role="button" type="button" class="btn btn-secondary">h</button>-->
-            <!--<button role="button" type="button" class="btn btn-secondary">day</button>-->
-            <!--<button role="button" type="button" class="btn btn-secondary">mon</button>-->
-            <!--</div>-->
             <div class="form-inline">
               <label for="time-start" class="mr-sm-2">开始时间</label>
               <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="datetime-local" v-model="start_time"
@@ -1026,6 +1019,7 @@
           .then(res => {
             console.log('get task_id: ');
             console.log(res.data);
+            alert("GPU数据加载成功！")
             return res.data;
           })
           .catch(err => {
